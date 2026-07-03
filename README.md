@@ -19,8 +19,6 @@ This benchmark makes that difference visible, per model, in dollars.
 
 ## Leaderboard
 
-First public run, July 3, 2026: twelve model configurations against the same 20 fresh hybrid-gauntlet tasks (code → narrative → table, at depths 3 and 6), single worker, provider-reported token counts, prices per [`pricing/prices.json`](pricing/prices.json). Every question, raw response, reasoning trace, and knob setting ships in [`benchmark_data/runs/20260703T070656Z_098392/`](benchmark_data/runs/20260703T070656Z_098392/): `manifest.json` records the exact API parameters per row, `VALIDATION.md` the pre-flight probes, and `ANALYSIS.md` the independent audit of these numbers.
-
 | # | model (exact config) | acc | \$/correct | waste | token-eff | out-tok |
 |--:|----------------------|----:|-----------:|------:|----------:|--------:|
 | 🏆 | **Human** (Ideal, the `echo` fixture: the bare correct answer) | **100%** | **~\$0.0** | **0x** | **100%** | **2** |
@@ -38,6 +36,8 @@ First public run, July 3, 2026: twelve model configurations against the same 20 
 | 12 | `anthropic:claude-fable-5` | 75% | \$0.03530 | 5.0x | 17.2% | 407 |
 
 n = 20 tasks per row, ranked by `$/correct`; 🥇 marks the best model per metric. The Human row wins every column and is the V\* floor: a person who works it out on scratch paper and hands back one number. Humans do not bill for their thinking; these models do.
+
+First public run, July 3, 2026: twelve model configurations against the same 20 fresh hybrid-gauntlet tasks (code → narrative → table, at depths 3 and 6), single worker, provider-reported token counts, prices per [`pricing/prices.json`](pricing/prices.json). Every question, raw response, reasoning trace, and knob setting ships in [`benchmark_data/runs/20260703T070656Z_098392/`](benchmark_data/runs/20260703T070656Z_098392/): `manifest.json` records the exact API parameters per row, `VALIDATION.md` the pre-flight probes, and `ANALYSIS.md` the independent audit of these numbers.
 
 **Key findings.** One line each here; evidence, autopsies, and extended commentary live in [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
 
