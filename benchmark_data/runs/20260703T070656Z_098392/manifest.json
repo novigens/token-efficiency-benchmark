@@ -20,7 +20,16 @@
   "models": [
     "moonshot:kimi-k2.5#thinking=off",
     "anthropic:claude-sonnet-5",
-    "openai:gpt-5.4#effort=medium"
+    "openai:gpt-5.4#effort=medium",
+    "openai:gpt-4.1-nano",
+    "openai:gpt-5.4-nano",
+    "openai:gpt-5.4#effort=low",
+    "anthropic:claude-haiku-4-5",
+    "moonshot:kimi-k2.6#thinking=off",
+    "moonshot:kimi-k2.6",
+    "anthropic:claude-opus-4-8",
+    "openai:gpt-5.5",
+    "anthropic:claude-fable-5"
   ],
   "weights": [
     1.0,
@@ -64,6 +73,73 @@
         "notes": "reasoning enabled explicitly (provider default is effort off); reasoning text not returned by provider, count captured"
       }
     },
-    "roster_rationale": "Shortlist run: three configurations that answered the validation task correctly in per-provider pre-flight curls (see VALIDATION.md). Excluded after validation: openai:gpt-5.4 default (answered instantly and wrong), moonshot:kimi-k2.5 default thinking (exhausted 4096-token budget without emitting an answer; correct answer present in its reasoning trace). This is a cost-comparison shortlist, not a full-roster leaderboard; excluded configs are documented, not hidden."
-  }
+    "roster_rationale": "Shortlist run: three configurations that answered the validation task correctly in per-provider pre-flight curls (see VALIDATION.md). Excluded after validation: openai:gpt-5.4 default (answered instantly and wrong), moonshot:kimi-k2.5 default thinking (exhausted 4096-token budget without emitting an answer; correct answer present in its reasoning trace). This is a cost-comparison shortlist, not a full-roster leaderboard; excluded configs are documented, not hidden.",
+    "batch_2": {
+      "note": "Nine additional configs run 2026-07-03 after the batch-1 comparison, same harness settings (workers 1, timeout 300s, max_output_tokens 16384, evidence capture). No per-config pre-flight probes; post-hoc audit in ANALYSIS.md.",
+      "per_row": {
+        "openai:gpt-4.1-nano": {
+          "endpoint": "chat.completions",
+          "params": {
+            "max_completion_tokens": 16384
+          }
+        },
+        "openai:gpt-5.4-nano": {
+          "endpoint": "chat.completions",
+          "params": {
+            "max_completion_tokens": 16384
+          }
+        },
+        "openai:gpt-5.4#effort=low": {
+          "endpoint": "chat.completions",
+          "params": {
+            "max_completion_tokens": 16384,
+            "reasoning_effort": "low"
+          }
+        },
+        "openai:gpt-5.5": {
+          "endpoint": "chat.completions",
+          "params": {
+            "max_completion_tokens": 16384
+          },
+          "note": "provider defaults; reasoning tokens observed in usage"
+        },
+        "anthropic:claude-haiku-4-5": {
+          "endpoint": "messages",
+          "params": {
+            "max_tokens": 16384
+          }
+        },
+        "anthropic:claude-opus-4-8": {
+          "endpoint": "messages",
+          "params": {
+            "max_tokens": 16384
+          }
+        },
+        "anthropic:claude-fable-5": {
+          "endpoint": "messages",
+          "params": {
+            "max_tokens": 16384
+          },
+          "note": "5/20 rows ended stop_reason=refusal; see ANALYSIS.md"
+        },
+        "moonshot:kimi-k2.6#thinking=off": {
+          "endpoint": "chat.completions",
+          "params": {
+            "max_tokens": 16384,
+            "thinking": {
+              "type": "disabled"
+            }
+          }
+        },
+        "moonshot:kimi-k2.6": {
+          "endpoint": "chat.completions",
+          "params": {
+            "max_tokens": 16384
+          },
+          "note": "default thinking; 1/20 rows died at the output cap"
+        }
+      }
+    }
+  },
+  "roster_rationale": "Batch 1 (first three models) was a shortlist of probe-validated configs; see VALIDATION.md. Batch 2 extends the run to the full priced roster without shortlisting, making the combined board a near-census of the price sheet (only gpt-5.4#effort=high remains unrun). Excluded batch-1 probe failures (kimi-k2.5 default, gpt-5.4 default) remain replayable from tasks.jsonl."
 }

@@ -33,3 +33,12 @@ remains replayable from this run's tasks.jsonl at any time.
   (~\$0.0022) using nearly the same token budget as Sonnet 5 (687 vs 693) at a
   third of the unit price, while K2.5's own default thinking mode spent 6x
   more tokens and produced nothing.
+
+
+## Batch 2 note (2026-07-03, post-publication)
+
+The nine additional configs (nanos, effort=low, haiku, opus, gpt-5.5, fable-5, k2.6 both modes)
+ran without per-config pre-flight probes. Post-hoc audit of all 260 rows is in ANALYSIS.md;
+notable findings there: fable-5 returned stop_reason=refusal on 5/20 arithmetic tasks,
+k2.6 default thinking died once at the 16,384 output cap, and the most-missed task
+(..2c6004c33dde) was re-derived by hand to confirm generator integrity (answer 6911).
