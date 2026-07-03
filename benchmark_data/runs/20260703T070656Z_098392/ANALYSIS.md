@@ -50,3 +50,12 @@ Both are clean, confident completions: distractors correctly identified, arithme
 Three spending strategies on identical questions. Kimi-instant reasons entirely in the open (mean 637 output tokens, all visible). GPT-5.4-medium reasons almost entirely in hiding (~555 hidden + ~13 visible). Sonnet-5 defaults do both (~582 hidden + ~552 visible = 1,134), and they pay the highest unit price for it. Token-efficiency and dollar-efficiency disagree on the winner: GPT is the most token-lean (eff 0.168), yet Kimi is 4.4× cheaper per correct outcome; unit price dominates verbosity, which is the benchmark's core thesis. Depth scaling: GPT's high fixed tax but 32-token marginal step suggests it would close the gap on much deeper tasks; Sonnet's 195-token step rate widens its gap with depth (7.5× Kimi's \$/correct at depth 6).
 
 Selection caveat: rows were shortlisted after a validation probe (see `VALIDATION.md`), so this is a cost comparison among validated-viable configs, not a neutral census of defaults.
+
+## Excluded configs (failed the probe)
+
+| config | probe result |
+|--------|--------------|
+| `moonshot:kimi-k2.5` (default, thinking on) | burned the full output budget, returned no answer |
+| `openai:gpt-5.4` (default, reasoning off) | instant wrong answer, 4 output tokens |
+
+Both remain replayable against this run's `tasks.jsonl`; transcripts in `VALIDATION.md`.

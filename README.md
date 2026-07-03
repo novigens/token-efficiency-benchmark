@@ -42,7 +42,14 @@ The three models also spent very differently. Kimi reasoned entirely in the open
 
 The cost decomposition separates a fixed thinking tax from a per-step rate. GPT-5.4 comes out at roughly 423 base + 32 tokens per step (expensive to start, cheapest to go deeper). Kimi comes out at 239 + 88, and Sonnet at 257 + 195, which scales worst: at depth 6 its \$/correct is 7.5× Kimi's. Even the winner paid 6.1× the theoretical floor. The `echo` row shows these tasks are answerable for about 2 output tokens.
 
-**What didn't make the table.** Two *default* configurations were disqualified in pre-flight validation on a shared probe task; the raw API transcripts are in [`VALIDATION.md`](benchmark_data/runs/20260703T070656Z_098392/VALIDATION.md). `moonshot:kimi-k2.5` with its default thinking ON found the correct answer mid-reasoning, kept second-guessing itself, and burned its entire output budget without ever emitting an answer. `openai:gpt-5.4` with its default reasoning OFF answered in 4 tokens, instantly and wrongly. Same weights as the winners above, one knob apart. Because rows were shortlisted after this probe, read the table as a cost comparison among validated-viable configs rather than a neutral census; the manifest records the selection rationale, and the excluded configs remain replayable from the same `tasks.jsonl`.
+**Failing configs, listed rather than hidden.** Two *default* configurations failed the shared pre-flight probe task and were excluded from the paid run; the raw API transcripts are in [`VALIDATION.md`](benchmark_data/runs/20260703T070656Z_098392/VALIDATION.md):
+
+| excluded config | probe result | failure mode |
+|-----------------|--------------|--------------|
+| `moonshot:kimi-k2.5` (default, thinking on) | no answer returned | found the correct answer mid-reasoning, kept second-guessing, burned the entire output budget |
+| `openai:gpt-5.4` (default, reasoning off) | wrong answer, 4 output tokens | answered instantly without reasoning at all |
+
+Same weights as the winners above, one knob apart. Because rows were shortlisted after this probe, read the leaderboard as a cost comparison among validated-viable configs rather than a neutral census; the manifest records the selection rationale, and the excluded configs remain replayable from the same `tasks.jsonl`.
 
 **Pending.** Priced in the sheet and queued but not yet run: `anthropic:claude-opus-4-8`, `anthropic:claude-haiku-4-5`, `openai:gpt-5.5`, `openai:gpt-5.4-nano`, `openai:gpt-5.4#effort=high`, `moonshot:kimi-k2.6`. This is the 20-task starter ladder (single run, no confidence intervals). Results from the publication-grade ladder and community submissions are welcome, provided every row ships its full run directory as evidence.
 

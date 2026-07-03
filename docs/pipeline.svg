@@ -1,87 +1,97 @@
 <svg viewBox="0 0 850 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pt pd" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <title id="pt">Token Efficiency Benchmark pipeline</title>
-  <desc id="pd">Family library feeds the generator. The generator drops the question straight down into the spine and sends the exact answer sideways, which drops straight down into the grader. A distractors block injects irrelevant information into the question. The spine reads left to right: reasoning LLM, question, response, grader, scores, leaderboard.</desc>
+  <desc id="pd">Family library feeds the generator. The generator sends the exact answer sideways to the grader lane and drops the question straight down into the model spine. A distractors block injects irrelevant information. The spine reads left to right: reasoning LLM, question, response, grader, scores, leaderboard.</desc>
   <defs>
-    <marker id="par" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L8,4 L0,8 z" fill="#6e7781"/>
+    <marker id="mg" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="#64748b"/>
     </marker>
+    <marker id="mb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="ma" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="#d97706"/>
+    </marker>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.4" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
   </defs>
 
   <rect x="0" y="0" width="850" height="360" fill="#ffffff"/>
 
-  <!-- Family library -->
-  <text x="241" y="22" font-size="10.5" fill="#656d76" text-anchor="middle" letter-spacing="1.2">FAMILY LIBRARY &#183; INTERCHANGEABLE, EXTENDABLE</text>
-  <rect x="41" y="30" width="400" height="34" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
-  <text x="241" y="52" font-size="11.5" fill="#1f2328" text-anchor="middle">Code &#183; Narrative &#183; Table &#183; Logic grid &#183; <tspan fill="#0969da">+ yours</tspan></text>
+  <!-- ========== GENERATION TIER ========== -->
+  <text x="241" y="22" font-size="10" fill="#6b7280" text-anchor="middle" letter-spacing="1.6" font-weight="600">FAMILY LIBRARY &#183; INTERCHANGEABLE &#183; EXTENDABLE</text>
+  <rect x="41" y="30" width="400" height="34" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.2" filter="url(#soft)"/>
+  <text x="241" y="52" font-size="11.5" fill="#312e81" text-anchor="middle" font-weight="500">Code &#183; Narrative &#183; Table &#183; Logic grid &#183; <tspan fill="#4f46e5" font-weight="700">+ yours</tspan></text>
 
-  <line x1="241" y1="64" x2="241" y2="86" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+  <line x1="241" y1="64" x2="241" y2="86" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
 
-  <!-- Generator -->
-  <rect x="116" y="90" width="250" height="64" rx="10" fill="#f6f8fa" stroke="#afb8c1"/>
-  <text x="241" y="112" font-size="13" fill="#1f2328" text-anchor="middle" font-weight="600">Generator</text>
-  <text x="241" y="128" font-size="9.5" fill="#656d76" text-anchor="middle">chains any families, any order</text>
-  <text x="241" y="142" font-size="9.5" fill="#656d76" text-anchor="middle">one hidden value &#183; fresh seed every run</text>
+  <rect x="116" y="90" width="250" height="64" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.2" filter="url(#soft)"/>
+  <text x="241" y="112" font-size="13" fill="#312e81" text-anchor="middle" font-weight="700">Generator</text>
+  <text x="241" y="128" font-size="9.5" fill="#6b7280" text-anchor="middle">chains any families, any order</text>
+  <text x="241" y="142" font-size="9.5" fill="#6b7280" text-anchor="middle">one hidden value &#183; fresh seed every run</text>
 
-  <!-- straight drop: generator to question -->
-  <line x1="241" y1="154" x2="241" y2="244" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+  <!-- Distractors (noise) -->
+  <rect x="30" y="176" width="120" height="42" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.2" filter="url(#soft)"/>
+  <text x="90" y="194" font-size="11" fill="#92400e" text-anchor="middle" font-weight="700">Distractors</text>
+  <text x="90" y="209" font-size="9.5" fill="#b45309" text-anchor="middle">irrelevant information</text>
+  <line x1="150" y1="197" x2="236" y2="197" stroke="#d97706" stroke-width="1.3" marker-end="url(#ma)"/>
 
-  <!-- Distractors block -->
-  <rect x="30" y="176" width="120" height="42" rx="8" fill="#eef1f4" stroke="#afb8c1"/>
-  <text x="90" y="194" font-size="11" fill="#1f2328" text-anchor="middle" font-weight="600">Distractors</text>
-  <text x="90" y="209" font-size="9.5" fill="#656d76" text-anchor="middle">irrelevant information</text>
-  <line x1="150" y1="197" x2="237" y2="197" stroke="#6e7781" stroke-width="1.2" marker-end="url(#par)"/>
+  <!-- Question drop: generator bottom straight into Question -->
+  <line x1="241" y1="154" x2="241" y2="243" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
 
-  <!-- Answer branch: right, then straight drop to grader -->
-  <line x1="366" y1="170" x2="422" y2="170" stroke="#6e7781" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#par)"/>
-  <rect x="426" y="144" width="134" height="52" rx="8" fill="#eef1f4" stroke="#afb8c1" stroke-dasharray="5 3"/>
-  <text x="493" y="165" font-size="12" fill="#0969da" text-anchor="middle" font-weight="600">Answer + V*</text>
-  <text x="493" y="182" font-size="9.5" fill="#656d76" text-anchor="middle">known upfront</text>
-  <line x1="493" y1="196" x2="493" y2="244" stroke="#6e7781" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#par)"/>
+  <!-- ========== TRUTH PATH (grader lane) ========== -->
+  <line x1="366" y1="122" x2="448" y2="122" stroke="#3b82f6" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#mb)"/>
+  <rect x="453" y="96" width="134" height="52" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.2" stroke-dasharray="6 4" filter="url(#soft)"/>
+  <text x="520" y="117" font-size="12" fill="#1d4ed8" text-anchor="middle" font-weight="700">Answer + V*</text>
+  <text x="520" y="134" font-size="9.5" fill="#6b7280" text-anchor="middle">known upfront</text>
+  <line x1="520" y1="148" x2="520" y2="243" stroke="#3b82f6" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#mb)"/>
 
-  <!-- Spine -->
+  <!-- ========== SPINE ========== -->
   <g>
-    <rect x="60" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
-    <text x="115" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Reasoning LLM</text>
-    <text x="115" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">under test</text>
+    <rect x="20" y="248" width="110" height="56" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.3" filter="url(#soft)"/>
+    <text x="75" y="270" font-size="11.5" fill="#0f172a" text-anchor="middle" font-weight="700">Reasoning LLM</text>
+    <text x="75" y="287" font-size="9.5" fill="#6b7280" text-anchor="middle">under test</text>
 
-    <line x1="170" y1="276" x2="184" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
-    <text x="177" y="268" font-size="8.5" fill="#656d76" text-anchor="middle">reads</text>
+    <line x1="130" y1="276" x2="184" y2="276" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
+    <text x="157" y="267" font-size="8.5" fill="#64748b" text-anchor="middle" font-style="italic">reads</text>
 
-    <rect x="186" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
-    <text x="241" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Question</text>
-    <text x="241" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">one merged prompt</text>
+    <rect x="186" y="248" width="110" height="56" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.3" filter="url(#soft)"/>
+    <text x="241" y="270" font-size="11.5" fill="#0f172a" text-anchor="middle" font-weight="700">Question</text>
+    <text x="241" y="287" font-size="9.5" fill="#6b7280" text-anchor="middle">one merged prompt</text>
 
-    <line x1="296" y1="276" x2="310" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
-    <text x="303" y="268" font-size="8.5" fill="#656d76" text-anchor="middle">yields</text>
+    <line x1="296" y1="276" x2="334" y2="276" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
+    <text x="315" y="267" font-size="8.5" fill="#64748b" text-anchor="middle" font-style="italic">yields</text>
 
-    <rect x="312" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
-    <text x="367" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Response</text>
-    <text x="367" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">+ billed tokens</text>
+    <rect x="336" y="248" width="110" height="56" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.3" filter="url(#soft)"/>
+    <text x="391" y="270" font-size="11.5" fill="#0f172a" text-anchor="middle" font-weight="700">Response</text>
+    <text x="391" y="287" font-size="9.5" fill="#6b7280" text-anchor="middle">+ billed tokens</text>
 
-    <line x1="422" y1="276" x2="436" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+    <line x1="446" y1="276" x2="463" y2="276" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
 
-    <rect x="438" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
-    <text x="493" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Grader</text>
-    <text x="493" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">wrong = zero</text>
+    <rect x="465" y="248" width="110" height="56" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" filter="url(#soft)"/>
+    <text x="520" y="270" font-size="11.5" fill="#0f172a" text-anchor="middle" font-weight="700">Grader</text>
+    <text x="520" y="287" font-size="9.5" fill="#6b7280" text-anchor="middle">wrong = zero</text>
 
-    <line x1="548" y1="276" x2="562" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+    <line x1="575" y1="276" x2="589" y2="276" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
 
-    <rect x="564" y="248" width="110" height="56" rx="8" fill="#eef1f4" stroke="#afb8c1"/>
-    <text x="619" y="270" font-size="11" fill="#1f2328" text-anchor="middle" font-weight="600" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">$ / correct</text>
-    <text x="619" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">efficiency &#183; waste &#215;</text>
+    <rect x="591" y="248" width="110" height="56" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.3" filter="url(#soft)"/>
+    <text x="646" y="270" font-size="11" fill="#065f46" text-anchor="middle" font-weight="700" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">$ / correct</text>
+    <text x="646" y="287" font-size="9.5" fill="#047857" text-anchor="middle">efficiency &#183; waste &#215;</text>
 
-    <line x1="674" y1="276" x2="688" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+    <line x1="701" y1="276" x2="715" y2="276" stroke="#64748b" stroke-width="1.6" marker-end="url(#mg)"/>
 
-    <rect x="690" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#6e7781"/>
-    <text x="745" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Leaderboard</text>
-    <text x="745" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">ranked by $ / correct</text>
+    <rect x="717" y="248" width="110" height="56" rx="10" fill="#1e293b" stroke="#0f172a" stroke-width="1.2" filter="url(#soft)"/>
+    <text x="772" y="270" font-size="11.5" fill="#ffffff" text-anchor="middle" font-weight="700">Leaderboard</text>
+    <text x="772" y="287" font-size="9.5" fill="#cbd5e1" text-anchor="middle">ranked by $ / correct</text>
   </g>
 
   <!-- Legend -->
-  <g font-size="10" fill="#656d76">
-    <line x1="64" y1="336" x2="92" y2="336" stroke="#6e7781" stroke-width="1.5"/>
-    <text x="98" y="340">what the model sees</text>
-    <line x1="250" y1="336" x2="278" y2="336" stroke="#6e7781" stroke-width="1.5" stroke-dasharray="4 3"/>
-    <text x="284" y="340">ground truth, grader only</text>
+  <g font-size="10">
+    <line x1="24" y1="336" x2="52" y2="336" stroke="#64748b" stroke-width="1.6"/>
+    <text x="58" y="340" fill="#6b7280">what the model sees</text>
+    <line x1="210" y1="336" x2="238" y2="336" stroke="#3b82f6" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <text x="244" y="340" fill="#6b7280">ground truth, grader only</text>
+    <line x1="412" y1="336" x2="440" y2="336" stroke="#d97706" stroke-width="1.3"/>
+    <text x="446" y="340" fill="#6b7280">injected noise</text>
   </g>
 </svg>
