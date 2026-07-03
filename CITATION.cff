@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this benchmark, please cite it as below."
+title: "Token Efficiency Benchmark: Measuring the Cost of Correct Outcomes in Large Language Models"
+type: software
+authors:
+  - family-names: "Quah"
+    given-names: "Ken"
+    affiliation: "Novigens Inc."
+version: "2.0.0"
+date-released: "2026-07-02"
+license: MIT
+repository-code: "https://github.com/novigens/token-efficiency-benchmark"
+abstract: >-
+  A contamination-resistant benchmark that measures dollars per correct
+  outcome on large language models. Multi-step tasks are procedurally
+  generated at evaluation time from parameterized families with ground truth
+  computed by construction or execution; models are scored by cost-weighted
+  token efficiency conditional on a correct terminal answer, using
+  provider-reported token counts as billing truth.
+keywords:
+  - large language models
+  - evaluation
+  - token efficiency
+  - benchmark
+  - cost per outcome
+  - contamination resistance

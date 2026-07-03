@@ -1,0 +1,69 @@
+{
+  "run_id": "20260703T070656Z_098392",
+  "created_at": "2026-07-03T07:06:56.924277+00:00",
+  "family": "hybrid",
+  "family_version": "2.0.0",
+  "run_seed": 141350295098392,
+  "seed_was_fresh_entropy": true,
+  "cells": [
+    {
+      "depth": 3,
+      "distractors": 1
+    },
+    {
+      "depth": 6,
+      "distractors": 3
+    }
+  ],
+  "n_per_cell": 10,
+  "recipe": "prog+chain+table",
+  "models": [
+    "moonshot:kimi-k2.5#thinking=off",
+    "anthropic:claude-sonnet-5",
+    "openai:gpt-5.4#effort=medium"
+  ],
+  "weights": [
+    1.0,
+    4.0
+  ],
+  "task_count": 20,
+  "replay": "teb run --family hybrid --run-seed 141350295098392 --cell 3:1 --cell 6:3 --n 10 --model echo",
+  "conditions": {
+    "harness": {
+      "package_version": "2.0.0",
+      "evaluator": "scripts/run_eval.py",
+      "workers": 1,
+      "request_timeout_s": 300,
+      "max_output_tokens": 16384,
+      "evidence_capture": "response_extra per row (reasoning text where provider exposes it, finish/stop reason, reasoning/thinking token counts)"
+    },
+    "rows": {
+      "moonshot:kimi-k2.5#thinking=off": {
+        "endpoint": "https://api.moonshot.ai/v1/chat/completions",
+        "params": {
+          "max_tokens": 16384,
+          "thinking": {
+            "type": "disabled"
+          }
+        },
+        "notes": "instant mode; temperature omitted (provider forces 1); hidden thinking disabled, visible CoT permitted"
+      },
+      "anthropic:claude-sonnet-5": {
+        "endpoint": "https://api.anthropic.com/v1/messages",
+        "params": {
+          "max_tokens": 16384
+        },
+        "notes": "provider defaults; model thinks by default (thinking tokens billed, text redacted by provider, count captured)"
+      },
+      "openai:gpt-5.4#effort=medium": {
+        "endpoint": "https://api.openai.com/v1/chat/completions",
+        "params": {
+          "max_completion_tokens": 16384,
+          "reasoning_effort": "medium"
+        },
+        "notes": "reasoning enabled explicitly (provider default is effort off); reasoning text not returned by provider, count captured"
+      }
+    },
+    "roster_rationale": "Shortlist run: three configurations that answered the validation task correctly in per-provider pre-flight curls (see VALIDATION.md). Excluded after validation: openai:gpt-5.4 default (answered instantly and wrong), moonshot:kimi-k2.5 default thinking (exhausted 4096-token budget without emitting an answer; correct answer present in its reasoning trace). This is a cost-comparison shortlist, not a full-roster leaderboard; excluded configs are documented, not hidden."
+  }
+}

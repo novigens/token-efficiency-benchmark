@@ -1,0 +1,16 @@
+{
+  "_note": "Dollars per MILLION tokens. Versioned price sheet; edit freely and re-run `teb score --pricing`. Moonshot rates verified July 2026 against platform docs; OpenAI/Anthropic rates from provider pricing pages as of 2026-07-02 (Sonnet 5 at intro pricing through 2026-08-31). Verify exact API model ids against each provider's /models endpoint before a run.",
+  "_version": "2026-07-02.roster-v1",
+  "moonshot:kimi-k2.5": {"in": 0.60, "out": 3.00},
+  "moonshot:kimi-k2.5#thinking=off": {"in": 0.60, "out": 3.00},
+  "moonshot:kimi-k2.6": {"in": 0.95, "out": 4.00},
+  "openai:gpt-5.5": {"in": 5.00, "out": 30.00},
+  "openai:gpt-5.4": {"in": 2.50, "out": 15.00},
+  "openai:gpt-5.4#effort=medium": {"in": 2.50, "out": 15.00},
+  "openai:gpt-5.4#effort=high": {"in": 2.50, "out": 15.00},
+  "openai:gpt-5.4-nano": {"in": 0.20, "out": 1.25},
+  "openai:gpt-4.1-nano": {"in": 0.10, "out": 0.40},
+  "anthropic:claude-opus-4-8": {"in": 5.00, "out": 25.00},
+  "anthropic:claude-sonnet-5": {"in": 2.00, "out": 10.00},
+  "anthropic:claude-haiku-4-5": {"in": 1.00, "out": 5.00}
+}

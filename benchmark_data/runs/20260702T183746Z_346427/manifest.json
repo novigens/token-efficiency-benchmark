@@ -1,0 +1,35 @@
+{
+  "run_id": "20260702T183746Z_346427",
+  "created_at": "2026-07-02T18:37:46.970431+00:00",
+  "family": "arithmetic_chain",
+  "family_version": "2.0.0",
+  "run_seed": 50304309346427,
+  "seed_was_fresh_entropy": true,
+  "cells": [
+    {
+      "depth": 3,
+      "distractors": 0
+    },
+    {
+      "depth": 6,
+      "distractors": 2
+    },
+    {
+      "depth": 10,
+      "distractors": 2
+    },
+    {
+      "depth": 14,
+      "distractors": 5
+    }
+  ],
+  "n_per_cell": 10,
+  "models": [
+    "moonshot:kimi-k2.5"
+  ],
+  "weights": [
+    1.0,
+    4.0
+  ],
+  "task_count": 40
+}

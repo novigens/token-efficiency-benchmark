@@ -1,0 +1,8 @@
+pytest-cache-files-*/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.env
+attic/
+coverage.xml
+.coverage
