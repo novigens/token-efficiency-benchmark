@@ -6,6 +6,20 @@ contamination-resistant benchmark generation. None of them individually combines
 runtime task generation, an optimal-cost baseline, and provider-billed dollar
 accounting; the contribution is the integration.
 
+## The buyer-side complaint (why now)
+
+In July 2026, Palantir CEO Alex Karp used a CNBC Squawk Box appearance to argue that
+frontier models have been oversold relative to delivered value, characterizing
+enterprise leaders as paying for tokens they cannot tie to outcomes
+([CNBC](https://www.cnbc.com/2026/07/01/palantir-karp-open-ai-anthropic-tokens.html),
+[PC Gamer](https://www.pcgamer.com/software/ai/something-has-gone-completely-wrong-palantir-ceo-rants-on-live-television-about-his-problems-with-the-ai-business-model-why-are-they-charging-for-tokens-if-its-so-valuable/),
+[AOL](https://www.aol.com/articles/alex-karp-rips-ai-labs-160741641.html)); trade
+coverage attached the label "token backlash" to enterprises auditing AI spend.
+Whatever one makes of the delivery, the structural point is the gap this benchmark
+instruments: the unit of sale (tokens) is decoupled from the unit of value (correct
+outcomes), the incentive rewards verbosity, and no widely used instrument prices that
+gap per model on contamination-resistant tasks.
+
 ## Economic evaluation (cost per correct outcome)
 
 - **Cost-of-Pass** (Erol, El, Suzgun, Yuksekgonul & Zou, 2025; arXiv:2504.13359) is the
