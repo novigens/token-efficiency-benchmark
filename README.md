@@ -17,6 +17,10 @@ Both models are "100% accurate," and every accuracy leaderboard scores them iden
 
 This benchmark makes that difference visible, per model, in dollars.
 
+![Benchmark pipeline: a family library feeds a generator; the question drops into the model spine while the exact answer goes straight to the grader, ending in scores and a leaderboard](docs/pipeline.svg)
+
+One picture, the whole protocol: a generator chains interchangeable task families around one hidden value, hands the question to the model and the exact answer to the grader, and every response is priced in dollars per correct outcome.
+
 ## The three metrics
 
 **Efficiency (0 to 1]** measures how close the model came to the theoretical minimum cost, called `V*` ("V-star"). V* is the cost of simply reading the prompt and emitting the shortest correct answer. A model at efficiency 1.0 wasted nothing; a model at 0.05 spent 20× the minimum. Wrong answers get no efficiency score at all, because being cheap and wrong is worth nothing.
@@ -29,18 +33,20 @@ This benchmark makes that difference visible, per model, in dollars.
 
 First public run, July 3, 2026: 20 fresh hybrid-gauntlet tasks (code → narrative → table, at depths 3 and 6), single worker, provider-reported token counts, prices per [`pricing/prices.json`](pricing/prices.json). Every question, raw response, reasoning trace, and knob setting ships in [`benchmark_data/runs/20260703T070656Z_098392/`](benchmark_data/runs/20260703T070656Z_098392/): `manifest.json` records the exact API parameters per row, `VALIDATION.md` the pre-flight probes, and `ANALYSIS.md` the independent audit of these numbers.
 
-| model (exact config) | n | acc | \$/correct | waste × | token-eff | mean out-tok |
-|----------------------|--:|----:|----------:|--------:|----------:|-------------:|
-| `moonshot:kimi-k2.5#thinking=off` | 20 | 1.000 | **\$0.00217** | 6.1 | 0.144 | 637 |
-| `openai:gpt-5.4#effort=medium` | 20 | 1.000 | \$0.00958 | 5.6 | 0.168 | 568 |
-| `anthropic:claude-sonnet-5` (defaults) | 20 | 0.900 | \$0.01396 | 11.1 | 0.085 | 1,134 |
-| `echo` reference (the V\* floor) | 20 | 1.000 | n/a | 0.0 | 1.000 | 2 |
+| model (exact config) | n | acc | \$/correct | waste | token-eff | mean out-tok |
+|----------------------|--:|----:|----------:|------:|----------:|-------------:|
+| `moonshot:kimi-k2.5#thinking=off` | 20 | 100% | **\$0.00217** | 6.1x | 14.4% | 637 |
+| `openai:gpt-5.4#effort=medium` | 20 | 100% | \$0.00958 | **5.6x** | **16.8%** | 568 |
+| `anthropic:claude-sonnet-5` (defaults) | 20 | 90% | \$0.01396 | 11.1x | 8.5% | 1,134 |
+| Ideal (the `echo` fixture, V\* floor) | 20 | 100% | ~\$0.0 | 0.0x | 100% | 2 |
 
-**What the numbers say.** All three models answered identical questions, and the two knob-tuned models solved every one. Even so, a correct answer cost 4.4× more on GPT-5.4-medium and 6.4× more on Sonnet 5 than on Kimi K2.5-instant. Notice the ranking flip: GPT-5.4 was the most *token*-efficient model on the board (568 mean output tokens against Kimi's 637), but unit price decided the dollars. That is exactly why this benchmark reports \$/correct rather than tokens.
+Best model per metric in bold; Ideal is the attainable floor, not a competitor.
 
-The three models also spent very differently. Kimi reasoned entirely in the open: thinking disabled, every token visible. GPT-5.4 hid nearly all of its work (~555 hidden reasoning tokens, ~13 visible). Sonnet 5 paid twice, producing ~582 hidden thinking tokens *plus* full visible workings, and it still slipped twice on depth-6 arithmetic. Both misses were confident, cleanly finished wrong answers, billed in full; \$/correct absorbs them by design.
+**What the numbers say.** Identical questions, near-identical accuracy, a 6.4x spread in what a correct answer costs. GPT-5.4-medium was the most token-lean model on the board, yet unit price handed the win to Kimi K2.5-instant at \$0.0022 per correct answer; that ranking flip is exactly why this benchmark reports dollars rather than tokens. Sonnet 5 paid twice (hidden thinking plus full visible workings) and still slipped twice at depth 6, with confident, cleanly finished wrong answers that were billed in full.
 
-The cost decomposition separates a fixed thinking tax from a per-step rate. GPT-5.4 comes out at roughly 423 base + 32 tokens per step (expensive to start, cheapest to go deeper). Kimi comes out at 239 + 88, and Sonnet at 257 + 195, which scales worst: at depth 6 its \$/correct is 7.5× Kimi's. Even the winner paid 6.1× the theoretical floor. The `echo` row shows these tasks are answerable for about 2 output tokens.
+Worth pausing on: every one of these tasks is verifiable by hand. A dozen lines of pencil-and-paper arithmetic reproduce the answer, no tricks, no ambiguity. Yet frontier reasoning models marketed on olympiad-grade math and coding results still miss some of them. That gap, between benchmark prestige and per-dollar reliability on checkable work, is the thing this project measures.
+
+The full audit trail lives with the run: independent recomputation of every dollar figure, the miss autopsy, and the fixed-thinking-tax vs per-step cost decomposition are in [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
 
 **Failing configs, listed rather than hidden.** Two *default* configurations failed the shared pre-flight probe task and were excluded from the paid run; the raw API transcripts are in [`VALIDATION.md`](benchmark_data/runs/20260703T070656Z_098392/VALIDATION.md):
 
@@ -55,15 +61,13 @@ Same weights as the winners above, one knob apart. Because rows were shortlisted
 
 ## How it works, in plain terms
 
-![Benchmark pipeline: a family library feeds a generator; the question drops into the model spine while the exact answer goes straight to the grader, ending in scores and a leaderboard](docs/pipeline.svg)
+1. **Fresh questions at runtime, every run.** Task families are recipes that can mint millions of distinct multi-step problems, and a brand-new question set is one `teb run` away. Memorizing a test set, or distilling its answers into model weights, buys nothing: the next run simply is not that test.
 
-1. **We generate fresh questions at runtime, every run.** Questions come from parameterized "task families". Think of a family as a recipe that can produce millions of different multi-step word problems. Because the questions didn't exist until the moment of evaluation, no model has seen them in training, and there is no static test set to memorize or leak.
+2. **The right answer is known before any model answers.** Questions are built *forward* from known values, or by executing generated code. No human graders, no "LLM judge" whose own biases contaminate the score.
 
-2. **We know the right answer before the model sees the question.** Each question is built *forward* from known values, or by actually executing generated code, so the ground truth is exact. No human graders, and no "LLM judge" whose own biases contaminate the score.
+3. **Correctness and cost are scored together.** A wrong answer earns zero, no matter how cheap. A correct answer is scored against the minimum possible cost: read the question, state the answer.
 
-3. **We score both correctness and cost.** A wrong answer earns zero, no matter how cheap. A correct answer is scored by how close the model came to the *minimum possible* cost: just reading the question and stating the answer.
-
-4. **We convert to dollars.** Token counts come from the provider's own usage report (the number they bill you for, which includes hidden "thinking" tokens), multiplied by the provider's own prices. Dollars are the only fair unit across providers, since every provider tokenizes differently but bills its own tokens at its own rates.
+4. **Everything converts to dollars.** Provider-reported token counts (the number you are billed for, hidden "thinking" tokens included) times the provider's own prices. Dollars are the only fair unit across providers.
 
 ## A worked example, end to end
 
