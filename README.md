@@ -17,39 +17,27 @@ Both models are "100% accurate," and every accuracy leaderboard scores them iden
 
 This benchmark makes that difference visible, per model, in dollars.
 
-![Benchmark pipeline: a family library feeds a generator; the question drops into the model spine while the exact answer goes straight to the grader, ending in scores and a leaderboard](docs/pipeline.svg)
-
-One picture, the whole protocol: a generator chains interchangeable task families around one hidden value, hands the question to the model and the exact answer to the grader, and every response is priced in dollars per correct outcome.
-
-## The three metrics
-
-**Efficiency (0 to 1]** measures how close the model came to the theoretical minimum cost, called `V*` ("V-star"). V* is the cost of simply reading the prompt and emitting the shortest correct answer. A model at efficiency 1.0 wasted nothing; a model at 0.05 spent 20× the minimum. Wrong answers get no efficiency score at all, because being cheap and wrong is worth nothing.
-
-**\$/correct** is the total dollars spent across all tasks, divided by the number of correct answers. This is the number a buyer cares about. Wrong answers make it worse automatically: you paid for them and got nothing back.
-
-**Waste ratio** counts how many multiples of the minimum the model overspent: `(actual cost − V*) / V*`. A waste ratio of 28 means the model spent 29× the necessary budget. It is the "token tax" in a single number.
-
 ## Leaderboard
 
 First public run, July 3, 2026: twelve model configurations against the same 20 fresh hybrid-gauntlet tasks (code → narrative → table, at depths 3 and 6), single worker, provider-reported token counts, prices per [`pricing/prices.json`](pricing/prices.json). Every question, raw response, reasoning trace, and knob setting ships in [`benchmark_data/runs/20260703T070656Z_098392/`](benchmark_data/runs/20260703T070656Z_098392/): `manifest.json` records the exact API parameters per row, `VALIDATION.md` the pre-flight probes, and `ANALYSIS.md` the independent audit of these numbers.
 
-| model (exact config) | n | acc | \$/correct | waste | token-eff | mean out-tok |
-|----------------------|--:|----:|----------:|------:|----------:|-------------:|
-| `openai:gpt-4.1-nano` | 20 | 45% | **\$0.00108** | 11.2x | 8.7% | 1,109 |
-| `openai:gpt-5.4-nano` | 20 | 40% | \$0.00184 | 5.4x | 15.8% | 520 |
-| `moonshot:kimi-k2.5#thinking=off` | 20 | 100% | \$0.00217 | 6.1x | 14.4% | 637 |
-| `moonshot:kimi-k2.6#thinking=off` | 20 | 90% | \$0.00395 | 7.3x | 12.7% | 787 |
-| `anthropic:claude-haiku-4-5` | 20 | 80% | \$0.00520 | 7.0x | 12.6% | 734 |
-| `openai:gpt-5.4#effort=low` | 20 | 95% | \$0.00673 | **3.3x** | **24.7%** | 355 |
-| `openai:gpt-5.4#effort=medium` | 20 | 100% | \$0.00958 | 5.6x | 16.8% | 568 |
-| `anthropic:claude-opus-4-8` | 20 | 95% | \$0.01380 | 4.1x | 20.1% | 402 |
-| `anthropic:claude-sonnet-5` (defaults) | 20 | 90% | \$0.01396 | 11.1x | 8.5% | 1,134 |
-| `openai:gpt-5.5` | 20 | 95% | \$0.01539 | 3.8x | 21.9% | 416 |
-| `moonshot:kimi-k2.6` (default thinking) | 20 | 95% | \$0.03418 | 77.8x | 1.8% | 8,015 |
-| `anthropic:claude-fable-5` | 20 | 75% | \$0.03530 | 5.0x | 17.2% | 407 |
-| Ideal human (`echo` fixture: the bare correct answer) | 20 | 100% | ~\$0.0 | 0.0x | 100% | 2 |
+| # | model (exact config) | acc | \$/correct | waste | token-eff | out-tok |
+|--:|----------------------|----:|-----------:|------:|----------:|--------:|
+| 🏆 | **Human** (Ideal, the `echo` fixture: the bare correct answer) | **100%** | **~\$0.0** | **0x** | **100%** | **2** |
+| 1 | `openai:gpt-4.1-nano` | 45% | 🥇 \$0.00108 | 11.2x | 8.7% | 1,109 |
+| 2 | `openai:gpt-5.4-nano` | 40% | \$0.00184 | 5.4x | 15.8% | 520 |
+| 3 | `moonshot:kimi-k2.5#thinking=off` | 100% | \$0.00217 | 6.1x | 14.4% | 637 |
+| 4 | `moonshot:kimi-k2.6#thinking=off` | 90% | \$0.00395 | 7.3x | 12.7% | 787 |
+| 5 | `anthropic:claude-haiku-4-5` | 80% | \$0.00520 | 7.0x | 12.6% | 734 |
+| 6 | `openai:gpt-5.4#effort=low` | 95% | \$0.00673 | 🥇 3.3x | 🥇 24.7% | 355 |
+| 7 | `openai:gpt-5.4#effort=medium` | 100% | \$0.00958 | 5.6x | 16.8% | 568 |
+| 8 | `anthropic:claude-opus-4-8` | 95% | \$0.01380 | 4.1x | 20.1% | 402 |
+| 9 | `anthropic:claude-sonnet-5` (defaults) | 90% | \$0.01396 | 11.1x | 8.5% | 1,134 |
+| 10 | `openai:gpt-5.5` | 95% | \$0.01539 | 3.8x | 21.9% | 416 |
+| 11 | `moonshot:kimi-k2.6` (default thinking) | 95% | \$0.03418 | 77.8x | 1.8% | 8,015 |
+| 12 | `anthropic:claude-fable-5` | 75% | \$0.03530 | 5.0x | 17.2% | 407 |
 
-Best model per metric in bold. The Ideal human row is the V\* floor: a person who works it out on scratch paper and hands back one number. Humans do not bill for their thinking; these models do. One reading note: \$/correct is retry economics (it assumes wrong answers are detectable and re-queried), so where correctness must hold on the first pass, read the accuracy column first.
+n = 20 tasks per row, ranked by \$/correct; 🥇 marks the best model per metric. The Human row wins every column and is the V\* floor: a person who works it out on scratch paper and hands back one number. Humans do not bill for their thinking; these models do. One reading note: \$/correct is retry economics (it assumes wrong answers are detectable and re-queried), so where correctness must hold on the first pass, read the accuracy column first.
 
 **What the numbers say.** Twelve configurations, identical questions, and a 33x spread in the cost of a correct answer. The nanos top \$/correct at 40 to 45% accuracy, which is the metric working as designed: it prices retry economics, and dirt-cheap wrong answers barely dent it when wrongness is detectable and a re-query is free. Where correctness must hold without an oracle, the cheapest clean sheet is `kimi-k2.5#thinking=off` at \$0.0022, and the quiet star is `gpt-5.4#effort=low`: 95% accuracy with the best waste (3.3x) and efficiency (24.7%) of any model, at half of Sonnet's cost per correct. The thinking knob is measurably a dial, not a switch: GPT-5.4 low to medium buys the last 5 accuracy points for 1.4x the money, while Kimi K2.6 off to on buys the same 5 points for 8.7x, averaging 8,015 output tokens per answer and dying once against the 16k output cap. At the premium end, GPT-5.5 and Opus 4.8 deliver 95% at six to seven times Kimi-instant's cost per correct, and the priciest model on the board, `claude-fable-5`, refused 5 of 20 tasks outright (API `stop_reason: refusal`, on prompts containing nothing but warehouse arithmetic), finishing at 75% accuracy and \$0.0353 per correct.
 
@@ -69,6 +57,18 @@ The full audit trail lives with the run: independent recomputation of every doll
 Same weights as the winners above, one knob apart. Because rows were shortlisted after this probe, read the leaderboard as a cost comparison among validated-viable configs rather than a neutral census; the manifest records the selection rationale, and the excluded configs remain replayable from the same `tasks.jsonl`.
 
 **Pending.** Still priced but not yet run: `openai:gpt-5.4#effort=high`. OpenAI's GPT-5.6 preview (Sol, Terra, Luna) joins the sheet the moment it is generally available. This remains the 20-task starter ladder (single run, no confidence intervals); publication-grade ladder results and community submissions are welcome, provided every row ships its full run directory as evidence.
+
+## The three metrics
+
+**Efficiency (0 to 1]** measures how close the model came to the theoretical minimum cost, called `V*` ("V-star"). V* is the cost of simply reading the prompt and emitting the shortest correct answer. A model at efficiency 1.0 wasted nothing; a model at 0.05 spent 20× the minimum. Wrong answers get no efficiency score at all, because being cheap and wrong is worth nothing.
+
+**\$/correct** is the total dollars spent across all tasks, divided by the number of correct answers. This is the number a buyer cares about. Wrong answers make it worse automatically: you paid for them and got nothing back.
+
+**Waste ratio** counts how many multiples of the minimum the model overspent: `(actual cost − V*) / V*`. A waste ratio of 28 means the model spent 29× the necessary budget. It is the "token tax" in a single number.
+
+![Benchmark pipeline: a family library feeds a generator; the question drops into the model spine while the exact answer goes straight to the grader, ending in scores and a leaderboard](docs/pipeline.svg)
+
+One picture, the whole protocol: a generator chains interchangeable task families around one hidden value, hands the question to the model and the exact answer to the grader, and every response is priced in dollars per correct outcome.
 
 ## How it works, in plain terms
 
