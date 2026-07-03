@@ -1,0 +1,87 @@
+<svg viewBox="0 0 850 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pt pd" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="pt">Token Efficiency Benchmark pipeline</title>
+  <desc id="pd">Family library feeds the generator. The generator drops the question straight down into the spine and sends the exact answer sideways, which drops straight down into the grader. A distractors block injects irrelevant information into the question. The spine reads left to right: reasoning LLM, question, response, grader, scores, leaderboard.</desc>
+  <defs>
+    <marker id="par" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="#6e7781"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="850" height="360" fill="#ffffff"/>
+
+  <!-- Family library -->
+  <text x="241" y="22" font-size="10.5" fill="#656d76" text-anchor="middle" letter-spacing="1.2">FAMILY LIBRARY &#183; INTERCHANGEABLE, EXTENDABLE</text>
+  <rect x="41" y="30" width="400" height="34" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
+  <text x="241" y="52" font-size="11.5" fill="#1f2328" text-anchor="middle">Code &#183; Narrative &#183; Table &#183; Logic grid &#183; <tspan fill="#0969da">+ yours</tspan></text>
+
+  <line x1="241" y1="64" x2="241" y2="86" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+
+  <!-- Generator -->
+  <rect x="116" y="90" width="250" height="64" rx="10" fill="#f6f8fa" stroke="#afb8c1"/>
+  <text x="241" y="112" font-size="13" fill="#1f2328" text-anchor="middle" font-weight="600">Generator</text>
+  <text x="241" y="128" font-size="9.5" fill="#656d76" text-anchor="middle">chains any families, any order</text>
+  <text x="241" y="142" font-size="9.5" fill="#656d76" text-anchor="middle">one hidden value &#183; fresh seed every run</text>
+
+  <!-- straight drop: generator to question -->
+  <line x1="241" y1="154" x2="241" y2="244" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+
+  <!-- Distractors block -->
+  <rect x="30" y="176" width="120" height="42" rx="8" fill="#eef1f4" stroke="#afb8c1"/>
+  <text x="90" y="194" font-size="11" fill="#1f2328" text-anchor="middle" font-weight="600">Distractors</text>
+  <text x="90" y="209" font-size="9.5" fill="#656d76" text-anchor="middle">irrelevant information</text>
+  <line x1="150" y1="197" x2="237" y2="197" stroke="#6e7781" stroke-width="1.2" marker-end="url(#par)"/>
+
+  <!-- Answer branch: right, then straight drop to grader -->
+  <line x1="366" y1="170" x2="422" y2="170" stroke="#6e7781" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#par)"/>
+  <rect x="426" y="144" width="134" height="52" rx="8" fill="#eef1f4" stroke="#afb8c1" stroke-dasharray="5 3"/>
+  <text x="493" y="165" font-size="12" fill="#0969da" text-anchor="middle" font-weight="600">Answer + V*</text>
+  <text x="493" y="182" font-size="9.5" fill="#656d76" text-anchor="middle">known upfront</text>
+  <line x1="493" y1="196" x2="493" y2="244" stroke="#6e7781" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#par)"/>
+
+  <!-- Spine -->
+  <g>
+    <rect x="60" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
+    <text x="115" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Reasoning LLM</text>
+    <text x="115" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">under test</text>
+
+    <line x1="170" y1="276" x2="184" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+    <text x="177" y="268" font-size="8.5" fill="#656d76" text-anchor="middle">reads</text>
+
+    <rect x="186" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
+    <text x="241" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Question</text>
+    <text x="241" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">one merged prompt</text>
+
+    <line x1="296" y1="276" x2="310" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+    <text x="303" y="268" font-size="8.5" fill="#656d76" text-anchor="middle">yields</text>
+
+    <rect x="312" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
+    <text x="367" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Response</text>
+    <text x="367" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">+ billed tokens</text>
+
+    <line x1="422" y1="276" x2="436" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+
+    <rect x="438" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#afb8c1"/>
+    <text x="493" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Grader</text>
+    <text x="493" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">wrong = zero</text>
+
+    <line x1="548" y1="276" x2="562" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+
+    <rect x="564" y="248" width="110" height="56" rx="8" fill="#eef1f4" stroke="#afb8c1"/>
+    <text x="619" y="270" font-size="11" fill="#1f2328" text-anchor="middle" font-weight="600" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">$ / correct</text>
+    <text x="619" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">efficiency &#183; waste &#215;</text>
+
+    <line x1="674" y1="276" x2="688" y2="276" stroke="#6e7781" stroke-width="1.5" marker-end="url(#par)"/>
+
+    <rect x="690" y="248" width="110" height="56" rx="8" fill="#f6f8fa" stroke="#6e7781"/>
+    <text x="745" y="270" font-size="11.5" fill="#1f2328" text-anchor="middle" font-weight="600">Leaderboard</text>
+    <text x="745" y="287" font-size="9.5" fill="#656d76" text-anchor="middle">ranked by $ / correct</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-size="10" fill="#656d76">
+    <line x1="64" y1="336" x2="92" y2="336" stroke="#6e7781" stroke-width="1.5"/>
+    <text x="98" y="340">what the model sees</text>
+    <line x1="250" y1="336" x2="278" y2="336" stroke="#6e7781" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="284" y="340">ground truth, grader only</text>
+  </g>
+</svg>

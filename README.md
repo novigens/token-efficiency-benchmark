@@ -48,6 +48,8 @@ The cost decomposition separates a fixed thinking tax from a per-step rate. GPT-
 
 ## How it works, in plain terms
 
+![Benchmark pipeline: a family library feeds a generator; the question drops into the model spine while the exact answer goes straight to the grader, ending in scores and a leaderboard](docs/pipeline.svg)
+
 1. **We generate fresh questions at runtime, every run.** Questions come from parameterized "task families". Think of a family as a recipe that can produce millions of different multi-step word problems. Because the questions didn't exist until the moment of evaluation, no model has seen them in training, and there is no static test set to memorize or leak.
 
 2. **We know the right answer before the model sees the question.** Each question is built *forward* from known values, or by actually executing generated code, so the ground truth is exact. No human graders, and no "LLM judge" whose own biases contaminate the score.
