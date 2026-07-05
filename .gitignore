@@ -6,3 +6,4 @@ __pycache__/
 attic/
 coverage.xml
 .coverage
+.DS_Store
