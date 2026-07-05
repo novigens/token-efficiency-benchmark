@@ -73,6 +73,20 @@ openai:gpt-5.4-nano                         482       8.4    20
 openai:gpt-5.5                               86      73.5    20
 ```
 
+## Depth scaling
+
+![Cost per correct answer between depths 3 and 6, and marginal output tokens per step, per model, with the ideal V* floor marked](./depth_scaling.png)
+
+How this should scale in the ideal case, derived from the benchmark's construction: accuracy flat at 100%, output growing by only a few tokens per additional step (one small state update each), so cost per correct answer grows gently and linearly, driven mostly by the longer prompt, and the waste ratio stays constant across depth. The dotted floor in the left panel is that ideal, priced from the echo fixture's actual V* at the sheet's cheapest rates: \$0.00018 at depth 3, \$0.00033 at depth 6.
+
+Against that reference, the observed signatures separate into three:
+
+- **No configuration matches the ideal.** The cheapest clean sheet sits 8x above the floor and steepens toward depth 6.
+- **The overthinker's tell is falling waste.** `kimi-k2.6` (default) is the only line that goes down, and not from skill: a five-figure fixed rumination tax amortizes over bigger problems (the K2.5 smoke run showed the same pattern, 38x waste at depth 3 falling to 17x at depth 14). Falling waste with depth looks like maturity and is the opposite.
+- **The underthinker's tell is collapse.** `gpt-5.4-nano` holds the flattest per-step slope on the board (8.4 tokens) while its accuracy halves from 60% to 20%: cheap steps into wrong answers.
+
+Two depth cells make these two-point fits, not curves; the depths-10 and 14 ladder is the pre-registered test.
+
 ## Verification (independent of the harness)
 
 - **Row inventory**: 260 rows = 13 configs × 20 tasks. Exactly one truncation in the entire run: `moonshot:kimi-k2.6` (default thinking) hit the 16,384 cap on task `..2c6004c33dde` (`finish_reason: length`, no answer). Every other row finished `stop` / `end_turn` / `refusal`.

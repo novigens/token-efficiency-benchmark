@@ -17,6 +17,13 @@ Both models are "100% accurate," and every accuracy leaderboard scores them iden
 
 This benchmark makes that difference visible, per model, in dollars.
 
+**TL;DR, why this exists.**
+
+- **Business:** choosing a model is a three-part decision: is it accurate enough, what does a correct answer cost, and was it tested on anything resembling your actual work? In our first run, the most expensive models matched cheaper ones on accuracy while costing two to seven times more per correct answer, and popular benchmarks rarely test the kind of multi-step work enterprises actually run.
+- **Theory:** today's reasoning models train on verifiable rewards, a sound idea shipped in its most degenerate form: one pass or fail signal per whole attempt, nothing teaching the model which step went wrong, nothing pricing its thinking. The remedies are textbook, step-level credit assignment (Bellman, Sutton) and the value of computation (Russell and Wefald, 1991), yet shipped models behave as if none of it exists. Add pay-per-token billing with hidden reasoning, where revenue rises with waste the buyer cannot inspect, and the conflict is structural, no intent required. This benchmark makes that waste measurable.
+
+This benchmark is built to expose exactly those weaknesses, on freshly generated tasks no model can have memorized. And it will keep exposing them until a frontier lab solves reasoning properly, with step-level credit assignment and priced computation rather than patches around them. The proof is simple and open to anyone: ship a model whose cost scales like state tracking, and top this board. The full argument, pinned to evidence rows and references: [`docs/motivation.md`](docs/motivation.md).
+
 ## Leaderboard
 
 | # | model (exact config) | acc | \$/correct | waste | token-eff | out-tok |
@@ -48,6 +55,10 @@ First public run, July 3, 2026: twelve model configurations against the same 20 
 - **The newest, priciest flagships rank worst per dollar.** The five most recent premium releases (Opus 4.8, Sonnet 5, GPT-5.5, Kimi K2.6, Fable 5) fill the five worst `$/correct` ranks on the board.
 - **Middle-school tasks, olympiad-grade models, real failures.** Every task is hand-verifiable with middle-school math, in the same season as gold-medal IMO and IOI results and beyond-PhD GPQA scores ([OpenAI](https://x.com/OpenAI/status/1946594928945148246), [DeepMind](https://deepmind.google/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/), [IOI 2025](https://the-decoder.com/openais-ai-system-wins-a-gold-medal-level-score-at-the-international-olympiad-in-informatics-2025/), [GPQA](https://openai.com/index/learning-to-reason-with-llms/)). On this board, a single 63-parcel distractor sentence took down 8 of 12 configurations, and the priciest model refused 5 of 20 tasks outright.
 - **Buyers already suspected it.** Alex Karp on CNBC: these models "have been completely, irresponsibly, oversold" ([CNBC, July 2026](https://www.cnbc.com/2026/07/01/palantir-karp-open-ai-anthropic-tokens.html)). This benchmark is a measuring instrument for that claim.
+
+![Cost per correct answer between depths 3 and 6, and marginal output tokens per step, with the ideal V* floor marked](benchmark_data/runs/20260703T070656Z_098392/depth_scaling.png)
+
+How depth separates them: an ideal state tracker stays at 100% accuracy, adds a few tokens per step, and holds waste flat (the dotted floor). Nobody matches it. The only falling line belongs to the heaviest overthinker, a fixed rumination tax amortizing over bigger problems, and the flattest per-step slope belongs to a model whose accuracy halves. Details and the three failure signatures: [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
 
 *Dear frontier labs: we believe you about the olympiad golds. Now please first solve the simple analytical questions any human can easily get right, as efficiently as a human does.*
 
