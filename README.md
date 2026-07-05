@@ -71,7 +71,7 @@ How depth separates them: an ideal state tracker stays at 100% accuracy, adds a 
 
 Same weights as the winners above, one knob apart. Because rows were shortlisted after this probe, read the leaderboard as a cost comparison among validated-viable configs rather than a neutral census; the manifest records the selection rationale, and the excluded configs remain replayable from the same `tasks.jsonl`.
 
-**The rest of the board belongs to the community.** We are not chasing every release: Gemini, Grok, Qwen, DeepSeek, GLM, and the rest of the international field all fit through the same OpenAI-compatible client or a small addition (see [Extending](#extending)). This is a 20-task starter ladder, single run, no confidence intervals; community rows are welcome, provided every row ships its full run directory as evidence.
+**The rest of the board belongs to the community.** We are not chasing every release: Gemini, Grok, Qwen, DeepSeek, GLM, and the rest of the international field all fit through the same OpenAI-compatible client or a small addition (see [Extending](#extending)). One pre-registered hypothesis waits for whoever runs the Gemini row: if it truly inherits the AlphaZero lineage, it should trace the ideal signature above ([why](docs/motivation.md)). This is a 20-task starter ladder, single run, no confidence intervals; community rows are welcome, provided every row ships its full run directory as evidence.
 
 ## The three metrics
 
