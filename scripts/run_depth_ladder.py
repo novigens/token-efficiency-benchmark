@@ -17,8 +17,13 @@ Early stopping (the rules are pre-registered here, in code):
   the rung are pruned at it: past that point deeper rungs mostly measure nothing.
 
 Usage:
-    python3 scripts/run_depth_ladder.py            # fresh ladder, climb, compare
-    python3 scripts/run_depth_ladder.py <run_dir>  # resume; finished pairs are skipped
+    python3 scripts/run_depth_ladder.py                      # fresh independent ladder
+    python3 scripts/run_depth_ladder.py --paired             # fresh PAIRED ladder
+    python3 scripts/run_depth_ladder.py [--paired] <run_dir> # resume either kind
+
+Paired mode: each of the five groups is ONE underlying problem extended across
+all rungs (same program, same table, same distractors, chain ops prefixed), so
+depth is isolated per item; see families/paired_ladder.py for the invariants.
 
 Fully resumable and safe to interrupt: results append per task, and on resume the
 prune and stop decisions are recomputed from the recorded results, so an existing
@@ -27,8 +32,11 @@ ladder run picks up new configs and new rules without re-spending on finished wo
 
 from __future__ import annotations
 
+import datetime
+import hashlib
 import json
 import re
+import secrets
 import statistics
 import subprocess
 import sys
@@ -36,7 +44,15 @@ from pathlib import Path
 
 from token_efficiency_benchmark.evaluation.harness import evaluate_task
 from token_efficiency_benchmark.evaluation.live_models import client_for_spec
-from token_efficiency_benchmark.serialization import read_tasks_jsonl, result_to_dict
+from token_efficiency_benchmark.families.paired_ladder import (
+    PAIRED_VERSION,
+    generate_paired_ladder,
+)
+from token_efficiency_benchmark.serialization import (
+    read_tasks_jsonl,
+    result_to_dict,
+    task_to_dict,
+)
 
 DEPTHS = list(range(3, 31, 3))
 N_PER_CELL = 5
@@ -82,12 +98,57 @@ def create_run() -> str:
     return m.group(0).rstrip(".,")
 
 
+def create_paired_run(run_seed: int | None) -> str:
+    run_seed = run_seed if run_seed is not None else secrets.randbits(48)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_dir = Path(f"benchmark_data/runs/{stamp}_{run_seed % 1_000_000:06d}-paired")
+    run_dir.mkdir(parents=True, exist_ok=False)
+    tasks = []
+    for i in range(N_PER_CELL):
+        h = hashlib.sha256(f"{run_seed}|group|{i}".encode())
+        tasks.extend(
+            generate_paired_ladder(int.from_bytes(h.digest()[:8], "big"), DEPTHS, DISTRACTORS)
+        )
+    with (run_dir / "tasks.jsonl").open("w", encoding="utf-8") as f:
+        for t in tasks:
+            f.write(json.dumps(task_to_dict(t), ensure_ascii=False) + "\n")
+    manifest = {
+        "run_id": run_dir.name,
+        "paired": True,
+        "family_version": PAIRED_VERSION,
+        "run_seed": run_seed,
+        "depths": DEPTHS,
+        "groups": N_PER_CELL,
+        "distractors": DISTRACTORS,
+        "task_count": len(tasks),
+        "replay": f"python3 scripts/run_depth_ladder.py --paired --run-seed {run_seed}",
+        "note": "No echo fixture rows; the ideal floor is derivable from each task's v_star fields.",
+    }
+    (run_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    print(
+        f"Paired run {run_dir.name}: {len(tasks)} tasks ({N_PER_CELL} groups x {len(DEPTHS)} rungs)"
+    )
+    return str(run_dir)
+
+
 def task_depth(task) -> int:  # type: ignore[no-untyped-def]
     return int(task.parameters["recipe"]["per_segment_difficulty"]["depth"])
 
 
 def main() -> None:
-    run_dir = Path(sys.argv[1] if len(sys.argv) > 1 else create_run())
+    argv = sys.argv[1:]
+    paired = "--paired" in argv
+    if paired:
+        argv.remove("--paired")
+    run_seed: int | None = None
+    if "--run-seed" in argv:
+        i = argv.index("--run-seed")
+        run_seed = int(argv[i + 1])
+        del argv[i : i + 2]
+    if argv:
+        run_dir = Path(argv[0])
+    else:
+        run_dir = Path(create_paired_run(run_seed) if paired else create_run())
     tasks = list(read_tasks_jsonl(run_dir / "tasks.jsonl"))
     results_path = run_dir / "results.jsonl"
     print(f"== depth ladder: {run_dir} | rungs {DEPTHS} | {len(tasks)} tasks ==")

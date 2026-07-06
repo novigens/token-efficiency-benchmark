@@ -174,6 +174,8 @@ class _Built:
         surface: tuple[int, ...],
         groups: tuple[str, ...],
         distractor_values: tuple[int, ...],
+        units: str = "",
+        site: str = "",
     ) -> None:
         self.narration = narration
         self.question = question
@@ -184,6 +186,8 @@ class _Built:
         self.surface = surface
         self.groups = groups
         self.distractor_values = distractor_values
+        self.units = units
+        self.site = site
 
 
 def recompute_truth(cells: dict[str, list[int]]) -> int:
@@ -283,6 +287,8 @@ def _build(
         surface=tuple(sorted(set(surface_cells) | set(distractor_values))),
         groups=groups,
         distractor_values=tuple(distractor_values),
+        units=units,
+        site=site,
     )
 
 

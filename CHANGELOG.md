@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Paired ladder mode (`families/paired_ladder.py`, version namespace `2.0.0+paired`):
+  one underlying problem extended across depth rungs (same program, same table, same
+  distractors, chain ops prefixed), isolating depth per item. Regular generation
+  streams and published replays are untouched.
+- Depth-ladder orchestrator (`scripts/run_depth_ladder.py`): rungs 3..30, accuracy and
+  efficiency pruning, majority early stop, resumable; `--paired` for the paired mode.
+
 ## 2.0.0 - 2026-07-02
 
 Initial public release.
