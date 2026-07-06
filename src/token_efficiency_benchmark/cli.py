@@ -228,7 +228,33 @@ def score(results: Path, pricing: Path | None, json_out: bool) -> None:
     default=None,
     help="Price-sheet JSON; enables the $/correct views.",
 )
-def compare(results_paths: tuple[Path, ...], pricing: Path | None) -> None:
+@click.option(
+    "--business",
+    is_flag=True,
+    default=False,
+    help="Append the business view: risk-adjusted $/correct with gates (needs --pricing).",
+)
+@click.option(
+    "--beta",
+    type=float,
+    default=0.8,
+    show_default=True,
+    help="Business-view penalty base: multiplier is beta**(k^2), k = wrong per 20 tasks.",
+)
+@click.option(
+    "--eff-gate",
+    type=float,
+    default=0.05,
+    show_default=True,
+    help="Business-view efficiency gate: configs below this mean efficiency are flagged.",
+)
+def compare(
+    results_paths: tuple[Path, ...],
+    pricing: Path | None,
+    business: bool,
+    beta: float,
+    eff_gate: float,
+) -> None:
     """Model-vs-model comparison: leaderboard, difficulty pivots, cost decomposition."""
 
     from .evaluation.pricing import load_price_sheet
@@ -239,7 +265,7 @@ def compare(results_paths: tuple[Path, ...], pricing: Path | None) -> None:
     for p in results_paths:
         results.extend(read_results_jsonl(p))
     sheet = load_price_sheet(pricing) if pricing else None
-    click.echo(format_comparison(results, sheet))
+    click.echo(format_comparison(results, sheet, business=business, beta=beta, eff_gate=eff_gate))
 
 
 @main.command()

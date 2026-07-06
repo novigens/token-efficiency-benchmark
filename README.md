@@ -17,6 +17,13 @@ Both models are "100% accurate," and every accuracy leaderboard scores them iden
 
 This benchmark makes that difference visible, per model, in dollars.
 
+**The business takeaway.** Ranked by risk-adjusted `$/correct`, the answer depends on how deep your workflows run:
+
+- Everyday depths (2026-07-03 board): `moonshot:kimi-k2.5#thinking=off` → `openai:gpt-5.4#effort=low` → `openai:gpt-5.4#effort=medium`
+- Deep multi-step stress (2026-07-06 paired ladder, depths 3 to 30): `anthropic:claude-opus-4-8` → `anthropic:claude-fable-5` → `openai:gpt-5.5`
+
+Match the depth profile to your workload. The full tables, the formula, and every dropped config with its reason: [Leaderboard](#leaderboard).
+
 **TL;DR, why this exists.**
 
 - **Business:** choosing a model is a three-part decision: is it accurate enough, what does a correct answer cost, and was it tested on anything resembling your actual work? In our first run, the most expensive models matched cheaper ones on accuracy while costing two to seven times more per correct answer, and popular benchmarks rarely test the kind of multi-step work enterprises actually run.
@@ -25,6 +32,30 @@ This benchmark makes that difference visible, per model, in dollars.
 This benchmark is built to expose exactly those weaknesses, on freshly generated tasks no model can have memorized. And it will keep exposing them until a frontier lab solves reasoning properly, with step-level credit assignment and priced computation rather than patches around them. The proof is simple and open to anyone: ship a model whose cost scales like state tracking, and top this board. The full argument, pinned to evidence rows and references: [`docs/motivation.md`](docs/motivation.md).
 
 ## Leaderboard
+
+### Business ranking, risk-adjusted `$/correct` (2026-07-06, paired depth ladder)
+
+| # | model (exact config) | n | acc | wrong | `$/correct` | risk-adj `$/correct` | note |
+|--:|----------------------|--:|----:|------:|------------:|---------------------:|------|
+| 🏆 | **Human** (Ideal: the bare correct answer) | - | **100%** | **0** | **~\$0.0** | **~\$0.0** | the V\* floor |
+| 1 | `anthropic:claude-opus-4-8` | 50 | 92% | 4 | \$0.01617 | **\$0.02862** | most trap-resistant on the board |
+| 2 | `anthropic:claude-fable-5` | 50 | 86% | 7 | \$0.04085 | **\$0.23** | no refusals this run |
+| 3 | `openai:gpt-5.5` | 50 | 80% | 10 | \$0.02628 | **\$0.93** | |
+| 4 | `anthropic:claude-sonnet-5` | 50 | 78% | 11 | \$0.01710 | \$1.29 | |
+| 5 | `openai:gpt-5.4#effort=medium` | 50 | 76% | 12 | \$0.01580 | \$2.70 | |
+| 6 | `openai:gpt-5.4#effort=low` | 50 | 70% | 15 | \$0.00993 | \$30.59 | |
+| 7 | `anthropic:claude-haiku-4-5` | 50 | 68% | 16 | \$0.00746 | \$69.55 | |
+| 8 | `openai:gpt-5.4-nano` | 15 | 33% | 10 | \$0.00232 | \$3.9e+14 | pruned at depth 9 |
+| 9 | `openai:gpt-4.1-nano` | 10 | 20% | 8 | \$0.00409 | \$2.6e+22 | pruned at depth 6 |
+| - | `openai:gpt-5.4` (default, reasoning off) | 5 | 0% | 5 | n/a | n/a | no correct answers; pruned at depth 3 |
+| - | `moonshot:kimi-k2.5#thinking=off` | - | - | - | - | n/a | skipped this run: Moonshot serving latency from the US makes the deep ladder impractical; see the 2026-07-03 board below |
+| - | `moonshot:kimi-k2.6#thinking=off` | - | - | - | - | n/a | skipped: same latency reason |
+| - | `moonshot:kimi-k2.5` (default thinking) | - | - | - | - | n/a | skipped: same latency reason |
+| - | `moonshot:kimi-k2.6` (default thinking) | - | - | - | - | n/a | skipped: same latency reason |
+
+Risk-adjusted `$/correct` = raw `$/correct` divided by 0.8^(k²), where k is wrong answers per 20 tasks: one wrong keeps 80% of value, two keep 41%, three 13%, four 3%. There is deliberately no unusability cutoff; the exponential penalty lets hopeless configs fall off the bottom naturally, and a price of \$10^14 per trusted answer reads as the verdict it is. This board is a deep-stress test: the paired ladder (run `20260706T222112Z_412022-paired`) extends five shared problems from depth 3 to depth 30, so accuracies sit far below the everyday board and one persistent distractor trap accounts for about ten of the wrongs of most survivors. Rows are pruned mid-ladder by pre-registered rules, which is why n varies. Reproduce with `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. This ranking openly needs statistically stronger samples; scaling it is a community-sized job the harness makes cheap.
+
+### Raw metrics (first public run, 2026-07-03)
 
 | # | model (exact config) | acc | \$/correct | waste | token-eff | out-tok |
 |--:|----------------------|----:|-----------:|------:|----------:|--------:|
@@ -49,16 +80,16 @@ First public run, July 3, 2026: twelve model configurations against the same 20 
 **Key findings.** One line each here; evidence, autopsies, and extended commentary live in [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
 
 - **A 33x spread on identical questions.** One correct answer costs between \$0.0011 and \$0.0353 depending on which configuration you ask.
-- **Cheap-and-wrong tops retry economics.** The nanos lead `$/correct` at 40 to 45% accuracy. That is the metric working as designed: it prices retries, which assumes wrong answers are detectable. Without an oracle, a 40% model is not cheap; it is unusable.
+- **Cheap-and-wrong tops retry economics, and risk pricing resolves it.** The nanos lead raw `$/correct` at 40 to 45% accuracy because that metric prices retries, which assumes wrong answers are detectable. The risk-adjusted column makes the business judgment explicit: the nanos price in the trillions of dollars per trusted answer.
 - **The cheapest clean sheet is a knob, not a flagship.** `kimi-k2.5#thinking=off` scores 100% at \$0.0022 per correct. The quiet star is `gpt-5.4#effort=low`: 95% with the board's best waste (3.3x) and token efficiency (24.7%).
 - **The thinking dial has vendor-specific exchange rates.** GPT-5.4 low to medium buys the last 5 accuracy points for 1.4x the money; Kimi K2.6 off to on buys the same 5 points for 8.7x, at 77.8x waste and one death against the output cap.
 - **The newest, priciest flagships rank worst per dollar.** The five most recent premium releases (Opus 4.8, Sonnet 5, GPT-5.5, Kimi K2.6, Fable 5) fill the five worst `$/correct` ranks on the board.
 - **Middle-school tasks, olympiad-grade models, real failures.** Every task is hand-verifiable with middle-school math, in the same season as gold-medal IMO and IOI results and beyond-PhD GPQA scores ([OpenAI](https://x.com/OpenAI/status/1946594928945148246), [DeepMind](https://deepmind.google/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/), [IOI 2025](https://the-decoder.com/openais-ai-system-wins-a-gold-medal-level-score-at-the-international-olympiad-in-informatics-2025/), [GPQA](https://openai.com/index/learning-to-reason-with-llms/)). On this board, a single 63-parcel distractor sentence took down 8 of 12 configurations, and the priciest model refused 5 of 20 tasks outright.
 - **Buyers already suspected it.** Alex Karp on CNBC: these models "have been completely, irresponsibly, oversold" ([CNBC, July 2026](https://www.cnbc.com/2026/07/01/palantir-karp-open-ai-anthropic-tokens.html)). This benchmark is a measuring instrument for that claim.
 
-![Cost per correct answer between depths 3 and 6, and marginal output tokens per step, with the ideal V* floor marked](benchmark_data/runs/20260703T070656Z_098392/depth_scaling.png)
+![Accuracy and cost per correct answer versus depth 3 to 30 on the paired ladder, with the ideal V* floor marked](benchmark_data/runs/20260706T222112Z_412022-paired/depth_scaling_paired.png)
 
-How depth separates them: an ideal state tracker stays at 100% accuracy, adds a few tokens per step, and holds waste flat (the dotted floor). Nobody matches it. The only falling line belongs to the heaviest overthinker, a fixed rumination tax amortizing over bigger problems, and the flattest per-step slope belongs to a model whose accuracy halves. Details and the three failure signatures: [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
+How depth separates them, now with real curves (paired ladder, 2026-07-06): through depth 30 the frontier tier shows no accuracy cliff, and the flat 80% lines are one bait-broken group, not depth. The weak tier collapses and is pruned on schedule. On the cost side nobody approaches the ideal floor at any depth: waste is a flat-rate tax, sitting 20 to 60x above V* from depth 3 all the way to depth 30. Full curves, the 77-parcel exhibit, and the honest outcome of our pre-registered depth prediction: [paired `ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
 
 *Dear frontier labs: we believe you about the olympiad golds. Now please first solve the simple analytical questions any human can easily get right, as efficiently as a human does.*
 
@@ -77,7 +108,7 @@ Same weights as the winners above, one knob apart. Because rows were shortlisted
 
 **Efficiency (0 to 1]** measures how close the model came to the theoretical minimum cost, called `V*` ("V-star"). V* is the cost of simply reading the prompt and emitting the shortest correct answer. A model at efficiency 1.0 wasted nothing; a model at 0.05 spent 20× the minimum. Wrong answers get no efficiency score at all, because being cheap and wrong is worth nothing.
 
-**\$/correct** is the total dollars spent across all tasks, divided by the number of correct answers. This is the number a buyer cares about. Wrong answers make it worse automatically: you paid for them and got nothing back.
+**\$/correct** is the total dollars spent across all tasks, divided by the number of correct answers. This is the number a buyer cares about. Wrong answers make it worse automatically: you paid for them and got nothing back. Its business variant, **risk-adjusted `$/correct`**, divides by 0.8^(k²) with k = wrong answers per 20 tasks, so unreliability compounds the price the way it compounds in deployed workflows (one wrong keeps 80% of value, two keep 41%, three 13%, four 3%); the 2026-07-06 board ranks by it.
 
 **Waste ratio** counts how many multiples of the minimum the model overspent: `(actual cost − V*) / V*`. A waste ratio of 28 means the model spent 29× the necessary budget. It is the "token tax" in a single number.
 
@@ -225,7 +256,7 @@ python3 scripts/run_eval.py $RUN openai:gpt-5.4-nano
 teb compare --results $RUN/results.jsonl --pricing pricing/prices.json
 ```
 
-You get three tables: a **leaderboard** sorted by \$/correct (the buying decision), **model × difficulty pivots** so degradation curves read left-to-right (the diagnosis), and a **cost decomposition** that splits each model's spending into a fixed "thinking tax" plus a per-step rate (the explanation). In the first public run, GPT-5.4-medium decomposed to ~423 base + 32 tokens per step, while Sonnet 5 scaled at ~195 per step (see [Leaderboard](#leaderboard)).
+You get three tables: a **leaderboard** sorted by \$/correct (the buying decision), **model × difficulty pivots** so degradation curves read left-to-right (the diagnosis), and a **cost decomposition** that splits each model's spending into a fixed "thinking tax" plus a per-step rate (the explanation). Add `--business` for the risk-adjusted buyer view described under the leaderboard. In the first public run, GPT-5.4-medium decomposed to ~423 base + 32 tokens per step, while Sonnet 5 scaled at ~195 per step (see [Leaderboard](#leaderboard)).
 
 **Common pitfalls.** Every one of these caught us during the first public run:
 

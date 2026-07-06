@@ -85,7 +85,7 @@ Against that reference, the observed signatures separate into three:
 - **The overthinker's tell is falling waste.** `kimi-k2.6` (default) is the only line that goes down, and not from skill: a five-figure fixed rumination tax amortizes over bigger problems (the K2.5 smoke run showed the same pattern, 38x waste at depth 3 falling to 17x at depth 14). Falling waste with depth looks like maturity and is the opposite.
 - **The underthinker's tell is collapse.** `gpt-5.4-nano` holds the flattest per-step slope on the board (8.4 tokens) while its accuracy halves from 60% to 20%: cheap steps into wrong answers.
 
-Two depth cells make these two-point fits, not curves; the depths-10 and 14 ladder is the pre-registered test.
+Two depth cells make these two-point fits, not curves; the depths-10 and 14 ladder is the pre-registered test. That test has since run: see `../20260706T222112Z_412022-paired/ANALYSIS.md` for ten-point curves to depth 30.
 
 ## Verification (independent of the harness)
 
@@ -117,3 +117,29 @@ Selection caveat, updated: batch 1 (the original three rows) was shortlisted aft
 **Recency and price predict \$/correct inversely here.** The five most recently released premium models (Opus 4.8, Sonnet 5, GPT-5.5, Kimi K2.6, Fable 5) occupy the five worst \$/correct ranks. Two mechanisms drive it: higher unit prices that their accuracy does not offset (GPT-5.5 and Opus deliver 95% at six to seven times Kimi-instant's cost per correct), and failure modes unique to the newest tier (K2.6's 8,015-token rumination, Fable's refusals). On these tasks, sticker prestige bought nothing per dollar.
 
 **Claims versus checkable work.** Every task here is verifiable with middle-school math and the ability to trace a short loop. This generation of models arrived with gold-medal IMO results (OpenAI, Google DeepMind), gold-level IOI scores, and beyond-PhD accuracy on GPQA. Yet on this board, one distractor sentence about a returned pallet of 63 parcels took down eight of twelve configurations, and the most expensive model refused a quarter of the tasks. That is the measurable version of what buyers have started saying out loud; Palantir's Alex Karp told CNBC these models "have been completely, irresponsibly, oversold," with enterprises paying for tokens that create no value. The gap between benchmark prestige and per-dollar reliability on checkable work is exactly what this benchmark measures.
+
+
+## Business view (added 2026-07-06)
+
+Risk-adjusted `$/correct` = raw `$/correct` / 0.8^(k^2), k = wrong answers per 20 tasks;
+gates: mean efficiency >= 5% and a non-underflowing penalty. Full rationale:
+`docs/motivation.md`, "One number for buyers". Reproduce with
+`teb compare --results results.jsonl --pricing ../../..//pricing/prices.json --business`.
+
+```
+== Business view: risk-adjusted $/correct (beta=0.8, k per 20 tasks, eff gate 5%) ==
+ # model                                  n   acc wrong  $/correct risk-adj $/corr  verdict
+--------------------------------------------------------------------------------------------
+ 1 moonshot:kimi-k2.5#thinking=off       20  100%     0    0.00217         0.00217  
+ 2 openai:gpt-5.4#effort=low             20   95%     1    0.00673         0.00841  
+ 3 openai:gpt-5.4#effort=medium          20  100%     0    0.00958         0.00958  
+ 4 moonshot:kimi-k2.6#thinking=off       20   90%     2    0.00395         0.00964  
+ 5 anthropic:claude-opus-4-8             20   95%     1    0.01380         0.01725  
+ 6 openai:gpt-5.5                        20   95%     1    0.01539         0.01924  
+ 7 anthropic:claude-sonnet-5             20   90%     2    0.01396         0.03408  
+ 8 anthropic:claude-haiku-4-5            20   80%     4    0.00520         0.18482  
+ 9 anthropic:claude-fable-5              20   75%     5    0.03530         9.34348  
+10 openai:gpt-4.1-nano                   20   45%    11    0.00108         5.8e+08  
+11 openai:gpt-5.4-nano                   20   40%    12    0.00184         1.7e+11  
+ - moonshot:kimi-k2.6                    20   95%     1    0.03418         0.04272  gated: efficiency 1.8% < 5% (too slow/wasteful to wait for)
+```

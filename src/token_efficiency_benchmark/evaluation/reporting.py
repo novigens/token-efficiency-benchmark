@@ -154,13 +154,104 @@ def format_cost_decomposition(results: Iterable[TaskResult]) -> str:
     return "".join(lines)
 
 
+def format_business_view(
+    results: Iterable[TaskResult],
+    sheet: dict[str, dict[str, float]],
+    beta: float = 0.8,
+    eff_gate: float = 0.05,
+    per: int = 20,
+) -> str:
+    """One number for buyers: risk-adjusted $/correct.
+
+    risk-adjusted $/correct = ($/correct) / beta**(k*k), where k is the number
+    of wrong answers normalized to ``per`` tasks. The quadratic exponent makes
+    each additional error hurt more than the last (errors compound in chained
+    workflows), calibrated so one wrong keeps ~80% of value, two ~41%, three
+    ~13%, four ~3%. There is deliberately no hard unusability cutoff: the
+    exponential penalty makes hopeless configs fall off the bottom naturally
+    (a 40%-accurate config prices in the hundreds of millions of dollars per
+    trusted answer, which reads as the verdict it is). The only labels are
+    the efficiency gate (a constraint, not a weight: too slow/wasteful to
+    wait for) and "no correct answers". Gated rows sort to the bottom with
+    their reason: failures are listed, never hidden.
+    """
+
+    by_model: dict[str, list[TaskResult]] = defaultdict(list)
+    for r in results:
+        if r.model in sheet:  # fixtures (echo) carry no prices and no business meaning
+            by_model[r.model].append(r)
+
+    usable: list[tuple[float, str]] = []
+    bottom: list[tuple[float, str]] = []
+    header = (
+        f"{'#':>2} {'model':<36} {'n':>3} {'acc':>5} {'wrong':>5} {'$/correct':>10} "
+        f"{'risk-adj $/corr':>15}  verdict\n"
+    )
+    for model, group in by_model.items():
+        n = len(group)
+        correct = [r for r in group if r.terminal_correct]
+        acc = len(correct) / n
+        k = (n - len(correct)) * per / n
+        prices = sheet[model]
+        spend = sum(_spend(r, prices) for r in group)
+        effs = [r.efficiency for r in correct if r.efficiency is not None]
+        eff = statistics.fmean(effs) if effs else 0.0
+        if not correct:
+            risk, shown, verdict = float("inf"), "n/a", f"no correct answers in {n}"
+        else:
+            risk = spend / len(correct) / beta ** (k * k)
+            shown = _compact_dollars(risk)
+            verdict = ""
+        if eff < eff_gate and correct:
+            verdict = (
+                f"gated: efficiency {eff:.1%} < {eff_gate:.0%} (too slow/wasteful to wait for)"
+            )
+        dpc = f"{spend / len(correct):.5f}" if correct else "n/a"
+        line = (
+            f"{model:<36} {n:>3d} {acc:>5.0%} {n - len(correct):>5d} {dpc:>10} "
+            f"{shown:>15}  {verdict}"
+        )
+        (bottom if verdict else usable).append((risk, line))
+
+    usable.sort()
+    bottom.sort()
+    lines = [
+        f"\n== Business view: risk-adjusted $/correct "
+        f"(beta={beta}, k per {per} tasks, eff gate {eff_gate:.0%}) ==\n",
+        header,
+        "-" * len(header) + "\n",
+    ]
+    for i, (_, line) in enumerate(usable, 1):
+        lines.append(f"{i:>2} {line}\n")
+    for _, line in bottom:
+        lines.append(f"{'-':>2} {line}\n")
+    return "".join(lines)
+
+
+def _compact_dollars(v: float) -> str:
+    """Small values at 5 decimals; absurd values in compact notation, so the
+    exponential penalty's verdict stays readable instead of overflowing."""
+
+    if v < 10:
+        return f"{v:.5f}"
+    if v < 1_000_000:
+        return f"{v:,.2f}"
+    return f"{v:.1e}"
+
+
 def format_comparison(
     results: Iterable[TaskResult],
     sheet: dict[str, dict[str, float]] | None = None,
+    business: bool = False,
+    beta: float = 0.8,
+    eff_gate: float = 0.05,
 ) -> str:
     results = list(results)
-    return (
+    out = (
         format_leaderboard(results, sheet)
         + format_pivots(results, sheet)
         + format_cost_decomposition(results)
     )
+    if business and sheet:
+        out += format_business_view(results, sheet, beta=beta, eff_gate=eff_gate)
+    return out

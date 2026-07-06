@@ -1,0 +1,23 @@
+{
+  "run_id": "20260706T222112Z_412022-paired",
+  "paired": true,
+  "family_version": "2.0.0+paired",
+  "run_seed": 204447552412022,
+  "depths": [
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    24,
+    27,
+    30
+  ],
+  "groups": 5,
+  "distractors": 2,
+  "task_count": 50,
+  "replay": "python3 scripts/run_depth_ladder.py --paired --run-seed 204447552412022",
+  "note": "No echo fixture rows; the ideal floor is derivable from each task's v_star fields."
+}
