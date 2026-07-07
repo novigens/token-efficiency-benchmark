@@ -52,7 +52,9 @@ Shallow everyday tasks flip the ranking toward cheaper models (`moonshot:kimi-k2
 
 How depth separates them, now with real curves (paired ladder, 2026-07-06): through depth 30 the frontier tier shows no accuracy cliff, and the flat 80% lines are one bait-broken group, not depth. The weak tier collapses and is pruned on schedule. On the cost side nobody approaches the ideal floor at any depth: waste is a flat-rate tax, sitting 20 to 60x above V* from depth 3 all the way to depth 30. Full curves, the 77-parcel exhibit, and the honest outcome of our pre-registered depth prediction: [paired `ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
 
-This is a deep-stress starter board (five shared problems per depth, single run); it needs community-scale samples, and rows for Gemini, Grok, Qwen, DeepSeek, and the rest of the field are welcome through the same client (see [Extending](#extending)), provided each ships its full run directory as evidence.
+> **Reproducibility disclaimer.** These are single-run numbers, five shared problems per depth: directional, not definitive. LLM outputs vary run to run, sometimes a lot. The same Fable 5 refused 5 of 20 tasks (25%) on the earlier 2026-07-03 board yet refused none here, which alone can swing a ranking. Numbers this close need repeated sampling before they are repeatable and reproducible. Treat this board as a shortlist and a method, not a verdict, and reproduce with your own sample size before you procure.
+
+Rows for Gemini, Grok, Qwen, DeepSeek, and the rest of the field are welcome through the same client (see [Extending](#extending)), provided each ships its full run directory as evidence; scaling the sample count is a community-sized job the harness makes cheap.
 
 ## The three metrics
 
