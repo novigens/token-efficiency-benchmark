@@ -25,35 +25,28 @@ On the token bill, Model B looks cheaper. But that one wrong total in twenty doe
 
 For shallow, everyday tasks the cheaper tier wins instead (`moonshot:kimi-k2.5#thinking=off`, then `openai:gpt-5.4#effort=low`). Treat this as a starting shortlist, then run your own workload's depth profile; the harness makes that cheap. Full tables, the formula, and every gated config with its reason: [Leaderboard](#leaderboard).
 
-**TL;DR, why this exists.**
-
-- **Business:** choosing a model is a three-part decision: is it accurate enough, what does a correct answer cost, and was it tested on anything resembling your actual work? In our first run, the most expensive models matched cheaper ones on accuracy while costing two to seven times more per correct answer, and popular benchmarks rarely test the kind of multi-step work enterprises actually run.
-- **Theory:** today's reasoning models train on verifiable rewards, a sound idea shipped in its most degenerate form: one pass or fail signal per whole attempt, nothing teaching the model which step went wrong, nothing pricing its thinking. The remedies are textbook, step-level credit assignment (Bellman, Sutton) and the value of computation (Russell and Wefald, 1991), yet shipped models behave as if none of it exists. Add pay-per-token billing with hidden reasoning, where revenue rises with waste the buyer cannot inspect, and the conflict is structural, no intent required. This benchmark makes that waste measurable.
-
-This benchmark is built to expose exactly those weaknesses, on freshly generated tasks no model can have memorized. And it will keep exposing them until a frontier lab solves reasoning properly, with step-level credit assignment and priced computation rather than patches around them. The proof is simple and open to anyone: ship a model whose cost scales like state tracking, and top this board. The full argument, pinned to evidence rows and references: [`docs/motivation.md`](docs/motivation.md).
-
 ## Leaderboard
 
 ### Business ranking, risk-adjusted `$/correct` (2026-07-06, paired depth ladder)
 
-| # | model (exact config) | n | acc | wrong | eff | `$/correct` | risk-adj `$/correct` | note |
-|--:|----------------------|--:|----:|------:|-----:|------------:|---------------------:|------|
-| 🏆 | **Human** (Ideal: the bare correct answer) | - | **100%** | **0** | **100%** | **~\$0.0** | **~\$0.0** | the V\* floor |
-| 1 | `anthropic:claude-opus-4-8` | 50 | 92% | 4 | 21.87% | \$0.01617 | **\$0.02862** | most trap-resistant on the board |
-| 2 | `anthropic:claude-fable-5` | 50 | 86% | 7 | 17.43% | \$0.04085 | **\$0.235** | no refusals this run |
-| 3 | `openai:gpt-5.5` | 50 | 80% | 10 | 22.14% | \$0.02628 | **\$0.933** | |
-| 4 | `anthropic:claude-sonnet-5` | 50 | 78% | 11 | 10.60% | \$0.01710 | \$1.286 | |
-| 5 | `openai:gpt-5.4#effort=medium` | 50 | 76% | 12 | 18.29% | \$0.01580 | \$2.701 | |
-| 6 | `anthropic:claude-haiku-4-5` | 50 | 74% | 13 | 13.09% | \$0.00686 | \$2.862 | |
-| 7 | `openai:gpt-5.4#effort=low` | 50 | 70% | 15 | 28.33% | \$0.00993 | \$30.59 | |
-| 8 | `openai:gpt-5.4-nano` | 15 | 33% | 10 | 14.60% | \$0.00232 | \$3.9e+14 | pruned at depth 9 |
-| 9 | `openai:gpt-4.1-nano` | 10 | 20% | 8 | 7.31% | \$0.00409 | \$2.6e+22 | pruned at depth 6 |
-| - | `deepseek:deepseek-v4-pro` | 50 | 76% | 12 | 4.97% | \$0.00391 | (\$0.668) | gated: 4.97% efficiency, just under the 5% floor |
-| - | `moonshot:kimi-k2.5` (default thinking) | 50 | 76% | 12 | 1.46% | \$0.04021 | (\$6.87) | gated: 1.46% efficiency, too slow to wait for |
-| - | `moonshot:kimi-k2.6` (default thinking) | 50 | 72% | 14 | 1.83% | \$0.05359 | (\$58.6) | gated: 1.83% efficiency, too slow to wait for |
-| - | `openai:gpt-5.4` (default, reasoning off) | 5 | 0% | 5 | - | n/a | n/a | no correct answers; pruned at depth 3 |
+| # | model (exact config) | acc | eff | `$/correct` | risk-adj `$/correct` | note |
+|--:|----------------------|----:|-----:|------------:|---------------------:|------|
+| 🏆 | **Human** (Ideal: the bare correct answer) | **100%** | **100%** | **~\$0.0** | **~\$0.0** | the V\* floor |
+| 1 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | **\$0.02862** | most trap-resistant on the board |
+| 2 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | **\$0.235** | no refusals this run |
+| 3 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | **\$0.933** | |
+| 4 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | |
+| 5 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | |
+| 6 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | |
+| 7 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | |
+| 8 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | pruned at depth 9 |
+| 9 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | pruned at depth 6 |
+| - | `deepseek:deepseek-v4-pro` | 76% | 4.97% | \$0.00391 | (\$0.668) | gated: 4.97% efficiency, just under the 5% floor |
+| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | gated: 1.46% efficiency, too slow to wait for |
+| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | gated: 1.83% efficiency, too slow to wait for |
+| - | `openai:gpt-5.4` (default, reasoning off) | 0% | - | n/a | n/a | no correct answers; pruned at depth 3 |
 
-Risk-adjusted `$/correct` = raw `$/correct` divided by 0.8^(k²), where k is wrong answers per 20 tasks: one wrong keeps 80% of value, two keep 41%, three 13%, four 3%. There is deliberately no hard cutoff for wrong-answer risk; the exponential penalty lets hopeless configs fall off the bottom naturally, and a price of \$10^14 per trusted answer reads as the verdict it is. The efficiency gate is a constraint, not a weight: a config below 5% mean efficiency (DeepSeek by a whisker at 4.97%, Kimi's default thinking modes by a mile) is flagged as too slow or wasteful to wait for, whatever it costs, and drops below the ranked rows. This board is a deep-stress test: the paired ladder (run `20260706T222112Z_412022-paired`) extends five shared problems from depth 3 to depth 30, so accuracies sit far below the everyday board and one persistent distractor trap accounts for about ten of the wrongs of most survivors. Rows are pruned mid-ladder by pre-registered rules, which is why n varies. The `#thinking=off` Moonshot variants that top the everyday board sat out this run for US serving latency. Reproduce with `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. This ranking openly needs statistically stronger samples; scaling it is a community-sized job the harness makes cheap.
+`acc` is accuracy on the 50 tasks each survivor saw; `eff` is mean token efficiency; `$/correct` is raw dollars per correct answer; **risk-adj `$/correct`** is the buying number, raw `$/correct` divided by 0.8^(k²) where k is wrong answers per 20 tasks (one wrong keeps 80% of value, two keep 41%, three 13%, four 3%). There is deliberately no hard cutoff for wrong-answer risk; the exponential penalty lets hopeless configs fall off the bottom naturally, and a price of \$10^14 per trusted answer reads as the verdict it is. The efficiency gate is a constraint, not a weight: a config below 5% mean efficiency (DeepSeek by a whisker at 4.97%, Kimi's default thinking modes by a mile) is flagged as too slow or wasteful to wait for, whatever it costs, and drops below the ranked rows. This board is a deep-stress test: the paired ladder (run `20260706T222112Z_412022-paired`) extends five shared problems from depth 3 to depth 30, so accuracies sit far below the everyday board and one persistent distractor trap accounts for many of the wrongs of most survivors. Weak configs are pruned mid-ladder by pre-registered rules, so they saw fewer tasks (noted per row); full per-row counts are in `teb compare`. The `#thinking=off` Moonshot variants that top the everyday board sat out this run for US serving latency. Reproduce with `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. This ranking openly needs statistically stronger samples; scaling it is a community-sized job the harness makes cheap.
 
 ### Raw metrics (first public run, 2026-07-03)
 
@@ -185,6 +178,13 @@ Now compare a terse model that solved the same gauntlet with 25 output tokens: c
 Aggregate those three behaviors over hundreds of fresh tasks per difficulty level, and luck washes out. What remains is each model's real cost-of-correctness curve.
 
 **This isn't hypothetical.** Our first smoke run (July 2026, single-family arithmetic chains) put Kimi K2.5 at 100% accuracy with a **28× average waste ratio**, and the waste was *highest on the easiest questions* (38× at depth 3 vs 17× at depth 14), because the model carries a fixed thinking overhead of roughly 540 tokens no matter how trivial the task. Most enterprise queries are trivial. That's the finding accuracy leaderboards structurally cannot produce.
+
+## Why this exists (for the technically curious)
+
+- **Business:** choosing a model is a three-part decision: is it accurate enough, what does a correct answer cost, and was it tested on anything resembling your actual work? In our runs, the most expensive models matched cheaper ones on accuracy while costing several times more per correct answer, and popular benchmarks rarely test the kind of multi-step work enterprises actually run.
+- **Theory:** today's reasoning models train on verifiable rewards, a sound idea shipped in its most degenerate form: one pass or fail signal per whole attempt, nothing teaching the model which step went wrong, nothing pricing its thinking. The remedies are textbook, step-level credit assignment (Bellman, Sutton) and the value of computation (Russell and Wefald, 1991), yet shipped models behave as if none of it exists. Add pay-per-token billing with hidden reasoning, where revenue rises with waste the buyer cannot inspect, and the conflict is structural, no intent required. This benchmark makes that waste measurable.
+
+This benchmark is built to expose exactly those weaknesses, on freshly generated tasks no model can have memorized. And it will keep exposing them until a frontier lab solves reasoning properly, with step-level credit assignment and priced computation rather than patches around them. The proof is simple and open to anyone: ship a model whose cost scales like state tracking, and top this board. The full argument, pinned to evidence rows and references: [`docs/motivation.md`](docs/motivation.md).
 
 ## Quick start
 
