@@ -35,24 +35,24 @@ This benchmark is built to expose exactly those weaknesses, on freshly generated
 
 ### Business ranking, risk-adjusted `$/correct` (2026-07-06, paired depth ladder)
 
-| # | model (exact config) | n | acc | wrong | `$/correct` | risk-adj `$/correct` | note |
-|--:|----------------------|--:|----:|------:|------------:|---------------------:|------|
-| 🏆 | **Human** (Ideal: the bare correct answer) | - | **100%** | **0** | **~\$0.0** | **~\$0.0** | the V\* floor |
-| 1 | `anthropic:claude-opus-4-8` | 50 | 92% | 4 | \$0.01617 | **\$0.02862** | most trap-resistant on the board |
-| 2 | `anthropic:claude-fable-5` | 50 | 86% | 7 | \$0.04085 | **\$0.23** | no refusals this run |
-| 3 | `openai:gpt-5.5` | 50 | 80% | 10 | \$0.02628 | **\$0.93** | |
-| 4 | `anthropic:claude-sonnet-5` | 50 | 78% | 11 | \$0.01710 | \$1.29 | |
-| 5 | `openai:gpt-5.4#effort=medium` | 50 | 76% | 12 | \$0.01580 | \$2.70 | |
-| 6 | `anthropic:claude-haiku-4-5` | 50 | 74% | 13 | \$0.00686 | \$2.86 | |
-| 7 | `openai:gpt-5.4#effort=low` | 50 | 70% | 15 | \$0.00993 | \$30.59 | |
-| 8 | `openai:gpt-5.4-nano` | 15 | 33% | 10 | \$0.00232 | \$3.9e+14 | pruned at depth 9 |
-| 9 | `openai:gpt-4.1-nano` | 10 | 20% | 8 | \$0.00409 | \$2.6e+22 | pruned at depth 6 |
-| 10 | `deepseek:deepseek-v4-pro` | 50 | 76% | 12 | \$0.00391 | \$0.66829 | gated: mean efficiency 4.97% < 5% |
-| 11 | `moonshot:kimi-k2.5` | 50 | 76% | 12 | \$0.04021 | \$6.87 | gated: mean efficiency 1.5% < 5% |
-| 12 | `moonshot:kimi-k2.6` | 50 | 72% | 14 | \$0.05359 | \$58.64 | gated: mean efficiency 1.8% < 5% |
-| - | `openai:gpt-5.4` (default, reasoning off) | 5 | 0% | 5 | n/a | n/a | no correct answers; pruned at depth 3 |
+| # | model (exact config) | n | acc | wrong | eff | `$/correct` | risk-adj `$/correct` | note |
+|--:|----------------------|--:|----:|------:|-----:|------------:|---------------------:|------|
+| 🏆 | **Human** (Ideal: the bare correct answer) | - | **100%** | **0** | **100%** | **~\$0.0** | **~\$0.0** | the V\* floor |
+| 1 | `anthropic:claude-opus-4-8` | 50 | 92% | 4 | 21.87% | \$0.01617 | **\$0.02862** | most trap-resistant on the board |
+| 2 | `anthropic:claude-fable-5` | 50 | 86% | 7 | 17.43% | \$0.04085 | **\$0.235** | no refusals this run |
+| 3 | `openai:gpt-5.5` | 50 | 80% | 10 | 22.14% | \$0.02628 | **\$0.933** | |
+| 4 | `anthropic:claude-sonnet-5` | 50 | 78% | 11 | 10.60% | \$0.01710 | \$1.286 | |
+| 5 | `openai:gpt-5.4#effort=medium` | 50 | 76% | 12 | 18.29% | \$0.01580 | \$2.701 | |
+| 6 | `anthropic:claude-haiku-4-5` | 50 | 74% | 13 | 13.09% | \$0.00686 | \$2.862 | |
+| 7 | `openai:gpt-5.4#effort=low` | 50 | 70% | 15 | 28.33% | \$0.00993 | \$30.59 | |
+| 8 | `openai:gpt-5.4-nano` | 15 | 33% | 10 | 14.60% | \$0.00232 | \$3.9e+14 | pruned at depth 9 |
+| 9 | `openai:gpt-4.1-nano` | 10 | 20% | 8 | 7.31% | \$0.00409 | \$2.6e+22 | pruned at depth 6 |
+| - | `deepseek:deepseek-v4-pro` | 50 | 76% | 12 | 4.97% | \$0.00391 | (\$0.668) | gated: 4.97% efficiency, just under the 5% floor |
+| - | `moonshot:kimi-k2.5` (default thinking) | 50 | 76% | 12 | 1.46% | \$0.04021 | (\$6.87) | gated: 1.46% efficiency, too slow to wait for |
+| - | `moonshot:kimi-k2.6` (default thinking) | 50 | 72% | 14 | 1.83% | \$0.05359 | (\$58.6) | gated: 1.83% efficiency, too slow to wait for |
+| - | `openai:gpt-5.4` (default, reasoning off) | 5 | 0% | 5 | - | n/a | n/a | no correct answers; pruned at depth 3 |
 
-Risk-adjusted `$/correct` = raw `$/correct` divided by 0.8^(k²), where k is wrong answers per 20 tasks: one wrong keeps 80% of value, two keep 41%, three 13%, four 3%. There is deliberately no hard cutoff for wrong-answer risk; the exponential penalty lets hopeless configs fall off the bottom naturally, and a price of \$10^14 per trusted answer reads as the verdict it is. Rows below the pre-registered 5% mean-efficiency gate are still shown with their prices, but not ranked as deployable winners because they are too slow or wasteful to wait for. This board is a deep-stress test: the paired ladder (run `20260706T222112Z_412022-paired`) extends five shared problems from depth 3 to depth 30, so accuracies sit far below the everyday board and one persistent distractor trap accounts for about ten of the wrongs of most survivors. Rows are pruned mid-ladder by pre-registered rules, which is why n varies. Reproduce with `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. This ranking openly needs statistically stronger samples; scaling it is a community-sized job the harness makes cheap.
+Risk-adjusted `$/correct` = raw `$/correct` divided by 0.8^(k²), where k is wrong answers per 20 tasks: one wrong keeps 80% of value, two keep 41%, three 13%, four 3%. There is deliberately no hard cutoff for wrong-answer risk; the exponential penalty lets hopeless configs fall off the bottom naturally, and a price of \$10^14 per trusted answer reads as the verdict it is. The efficiency gate is a constraint, not a weight: a config below 5% mean efficiency (DeepSeek by a whisker at 4.97%, Kimi's default thinking modes by a mile) is flagged as too slow or wasteful to wait for, whatever it costs, and drops below the ranked rows. This board is a deep-stress test: the paired ladder (run `20260706T222112Z_412022-paired`) extends five shared problems from depth 3 to depth 30, so accuracies sit far below the everyday board and one persistent distractor trap accounts for about ten of the wrongs of most survivors. Rows are pruned mid-ladder by pre-registered rules, which is why n varies. The `#thinking=off` Moonshot variants that top the everyday board sat out this run for US serving latency. Reproduce with `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. This ranking openly needs statistically stronger samples; scaling it is a community-sized job the harness makes cheap.
 
 ### Raw metrics (first public run, 2026-07-03)
 

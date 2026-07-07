@@ -19,8 +19,12 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
-MOONSHOT_BASE_URL = "https://api.moonshot.cn/v1"
-DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+# Moonshot serves two regional endpoints with separate accounts: the
+# international ``api.moonshot.ai`` (default here) and the China-mainland
+# ``api.moonshot.cn``. Override per environment with MOONSHOT_BASE_URL so the
+# benchmark stays provider- and region-agnostic.
+MOONSHOT_BASE_URL = os.environ.get("MOONSHOT_BASE_URL", "https://api.moonshot.ai/v1")
+DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 
 def _env_flag(name: str, *, default: bool = False) -> bool:

@@ -6,18 +6,21 @@
 
 ```
 == Business view: risk-adjusted $/correct (beta=0.8, k per 20 tasks, eff gate 5%) ==
- # model                                  n   acc wrong  $/correct risk-adj $/corr  verdict
---------------------------------------------------------------------------------------------
- 1 anthropic:claude-opus-4-8             50   92%     4    0.01617         0.02862  
- 2 anthropic:claude-fable-5              50   86%     7    0.04085         0.23494  
- 3 openai:gpt-5.5                        50   80%    10    0.02628         0.93348  
- 4 anthropic:claude-sonnet-5             50   78%    11    0.01710         1.28563  
- 5 openai:gpt-5.4#effort=medium          50   76%    12    0.01580         2.70122  
- 6 openai:gpt-5.4#effort=low             50   70%    15    0.00993           30.59  
- 7 anthropic:claude-haiku-4-5            50   68%    16    0.00746           69.55  
- 8 openai:gpt-5.4-nano                   15   33%    10    0.00232         3.9e+14  
- 9 openai:gpt-4.1-nano                   10   20%     8    0.00409         2.6e+22  
- - openai:gpt-5.4                         5    0%     5        n/a             n/a  no correct answers in 5
+ # model                                  n   acc wrong     eff  $/correct risk-adj $/corr  verdict
+----------------------------------------------------------------------------------------------------
+ 1 anthropic:claude-opus-4-8             50   92%     4  21.87%    0.01617         0.02862  
+ 2 anthropic:claude-fable-5              50   86%     7  17.43%    0.04085         0.23494  
+ 3 openai:gpt-5.5                        50   80%    10  22.14%    0.02628         0.93348  
+ 4 anthropic:claude-sonnet-5             50   78%    11  10.60%    0.01710         1.28563  
+ 5 openai:gpt-5.4#effort=medium          50   76%    12  18.29%    0.01580         2.70122  
+ 6 anthropic:claude-haiku-4-5            50   74%    13  13.09%    0.00686         2.86164  
+ 7 openai:gpt-5.4#effort=low             50   70%    15  28.33%    0.00993           30.59  
+ 8 openai:gpt-5.4-nano                   15   33%    10  14.60%    0.00232         3.9e+14  
+ 9 openai:gpt-4.1-nano                   10   20%     8   7.31%    0.00409         2.6e+22  
+ - deepseek:deepseek-v4-pro              50   76%    12   4.97%    0.00391         0.66829  gated: efficiency 4.97% below 5% floor (too slow/wasteful to wait for)
+ - moonshot:kimi-k2.5                    50   76%    12   1.46%    0.04021         6.87264  gated: efficiency 1.46% below 5% floor (too slow/wasteful to wait for)
+ - moonshot:kimi-k2.6                    50   72%    14   1.83%    0.05359           58.64  gated: efficiency 1.83% below 5% floor (too slow/wasteful to wait for)
+ - openai:gpt-5.4                         5    0%     5   0.00%        n/a             n/a  no correct answers in 5
 ```
 
 ## Findings

@@ -53,8 +53,8 @@ def test_penalty_is_beta_to_k_squared():
     out = format_business_view(two_wrong, sheet, beta=0.8)
     # $/correct for 20 rows of identical spend s: dpc = 20s/18; risk = dpc / 0.8**4
     row = next(ln for ln in out.splitlines() if "m:x" in ln)
-    dpc = float(row.split()[5])
-    risk = float(row.split()[6])
+    dpc = float(row.split()[6])
+    risk = float(row.split()[7])
     assert abs(risk - dpc / 0.8**4) < 5e-5  # both columns print at 5 decimals
 
 
@@ -63,7 +63,7 @@ def test_k_is_normalized_per_20_tasks():
     # 1 wrong of 10 tasks == 2 wrong per 20 => k=2, penalty beta**4
     out = format_business_view(_rows("m:x", 9, 1), sheet, beta=0.8)
     row = next(ln for ln in out.splitlines() if "m:x" in ln)
-    dpc, risk = float(row.split()[5]), float(row.split()[6])
+    dpc, risk = float(row.split()[6]), float(row.split()[7])
     assert abs(risk - dpc / 0.8**4) < 5e-5
 
 
@@ -90,6 +90,34 @@ def test_hopeless_config_prices_astronomically_but_stays_listed():
     good_i = next(i for i, ln in enumerate(lines) if "m:good" in ln)
     assert bad_i > good_i
     assert "e+" in lines[bad_i]  # compact notation for an economically absurd price
+
+
+def test_borderline_gate_reads_truthfully_at_two_decimals():
+    """A config just under the floor (~4.97%) must gate on the true float value
+    and display two decimals so the verdict reads '4.97% below 5%', never a
+    self-contradictory '5.0% below 5%'."""
+
+    sheet = {"m:border": {"in": 1.0, "out": 4.0}}
+    borderline = [_result("m:border", True, out_tok=1453) for _ in range(20)]
+    eff = borderline[0].efficiency
+    assert eff is not None and 0.049 < eff < 0.05  # genuinely below the 5% floor
+    out = format_business_view(borderline, sheet, eff_gate=0.05)
+    row = next(ln for ln in out.splitlines() if "m:border" in ln)
+    assert "gated: efficiency 4.9" in row and "below 5%" in row
+
+
+def test_truly_slow_config_still_gates():
+    sheet = {"m:slow": {"in": 1.0, "out": 4.0}}
+    out = format_business_view(_rows("m:slow", 20, 0, out_tok=16000), sheet, eff_gate=0.05)
+    row = next(ln for ln in out.splitlines() if "m:slow" in ln)
+    assert "gated: efficiency" in row and "below 5%" in row
+
+
+def test_above_floor_config_is_not_gated():
+    sheet = {"m:ok": {"in": 1.0, "out": 4.0}}
+    out = format_business_view(_rows("m:ok", 20, 0, out_tok=500), sheet, eff_gate=0.05)
+    row = next(ln for ln in out.splitlines() if "m:ok" in ln)
+    assert "gated" not in row
 
 
 def test_no_correct_answers_is_labelled():

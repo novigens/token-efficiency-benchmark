@@ -184,8 +184,8 @@ def format_business_view(
     usable: list[tuple[float, str]] = []
     bottom: list[tuple[float, str]] = []
     header = (
-        f"{'#':>2} {'model':<36} {'n':>3} {'acc':>5} {'wrong':>5} {'$/correct':>10} "
-        f"{'risk-adj $/corr':>15}  verdict\n"
+        f"{'#':>2} {'model':<36} {'n':>3} {'acc':>5} {'wrong':>5} {'eff':>7} "
+        f"{'$/correct':>10} {'risk-adj $/corr':>15}  verdict\n"
     )
     for model, group in by_model.items():
         n = len(group)
@@ -196,6 +196,9 @@ def format_business_view(
         spend = sum(_spend(r, prices) for r in group)
         effs = [r.efficiency for r in correct if r.efficiency is not None]
         eff = statistics.fmean(effs) if effs else 0.0
+        # Gate on the true float value; display two decimals so a config just
+        # under the floor reads truthfully (4.97% < 5%) and falls to the bottom
+        # naturally, with no rounding contradiction.
         if not correct:
             risk, shown, verdict = float("inf"), "n/a", f"no correct answers in {n}"
         else:
@@ -204,12 +207,13 @@ def format_business_view(
             verdict = ""
         if eff < eff_gate and correct:
             verdict = (
-                f"gated: efficiency {eff:.1%} < {eff_gate:.0%} (too slow/wasteful to wait for)"
+                f"gated: efficiency {eff:.2%} below {eff_gate:.0%} "
+                "floor (too slow/wasteful to wait for)"
             )
         dpc = f"{spend / len(correct):.5f}" if correct else "n/a"
         line = (
-            f"{model:<36} {n:>3d} {acc:>5.0%} {n - len(correct):>5d} {dpc:>10} "
-            f"{shown:>15}  {verdict}"
+            f"{model:<36} {n:>3d} {acc:>5.0%} {n - len(correct):>5d} {eff * 100:>6.2f}% "
+            f"{dpc:>10} {shown:>15}  {verdict}"
         )
         (bottom if verdict else usable).append((risk, line))
 
