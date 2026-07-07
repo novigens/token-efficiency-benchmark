@@ -4,25 +4,26 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
-**What does a correct answer actually cost on each LLM?**
+**What does a correct answer actually cost an enterprise on each LLM?**
 
-That's the question this benchmark answers. Every model provider bills you per token, but what you actually want to buy is correct outcomes. Those two things have drifted far apart, and nobody measures the gap.
+Every provider bills you per token. What you actually buy is correct outcomes, and in a business workflow a wrong outcome is not free: it flows downstream, corrupts the result that ships, and someone has to catch and redo it. This benchmark prices what matters, the cost of a *trusted* answer, tokens plus the business risk of the errors.
 
-Here's the problem in one picture. Ask two models a question whose answer is `38`:
+Here is the problem in one picture. Two models run the same back-office workflow, ten short steps long (read a ledger, chain some arithmetic, tabulate a total), each step no harder than middle-school math but the chain is long:
 
-- **Model A** thinks silently and replies: `38`. You pay for ~270 prompt tokens and 1 output token.
-- **Model B** writes 1,200 tokens of step-by-step reasoning and then says `38`. You pay for ~270 prompt tokens and 1,200 output tokens.
+- **Model A** costs a little more per token and gets every step right. A correct total, every run.
+- **Model B** is cheaper per token but slips on one run in five: four totals right, one silently wrong.
 
-Both models are "100% accurate," and every accuracy leaderboard scores them identically. But Model B cost you roughly **16× more** for the same outcome. If Model B is a reasoning model, most of those tokens were never even shown to you. Multiply that by a million queries a month, and the difference is a budget line, not a rounding error.
+On the token bill, Model B looks cheaper. But that one wrong total in twenty does not announce itself. It lands in a report, a reconciliation, an invoice, and the cost to detect and fix it dwarfs the token savings. Price that risk in and Model B is far more expensive per trusted answer. That gap is what this benchmark measures, per model, in dollars.
 
-This benchmark makes that difference visible, per model, in dollars.
+**Why enterprise work looks like this.** Most business tasks are simple per step (tabulate a table, apply a pricing rule, run a short calculation) but chained long, and the failure that costs money is the one at the *end* of the chain, because that is the number that ships. So we score correctness and cost together and penalize errors superlinearly: one slip is tolerable, but a model that fails several times in twenty is a liability no matter how cheap its tokens, because each failure is a cleanup cost, not a discount.
 
-**The business takeaway.** Ranked by risk-adjusted `$/correct`, the answer depends on how deep your workflows run:
+**Recommendation.** Ranked by risk-adjusted `$/correct` (the cost of a trusted answer), calibrated for the deep multi-step workflows enterprises actually run:
 
-- Everyday depths (2026-07-03 board): `moonshot:kimi-k2.5#thinking=off` → `openai:gpt-5.4#effort=low` → `openai:gpt-5.4#effort=medium`
-- Deep multi-step stress (2026-07-06 paired ladder, depths 3 to 30): `anthropic:claude-opus-4-8` → `anthropic:claude-fable-5` → `openai:gpt-5.5`
+1. **`anthropic:claude-opus-4-8`**: most reliable on long chains, and cheapest once risk is priced in.
+2. `anthropic:claude-fable-5`
+3. `openai:gpt-5.5`
 
-Match the depth profile to your workload. The full tables, the formula, and every dropped config with its reason: [Leaderboard](#leaderboard).
+For shallow, everyday tasks the cheaper tier wins instead (`moonshot:kimi-k2.5#thinking=off`, then `openai:gpt-5.4#effort=low`). Treat this as a starting shortlist, then run your own workload's depth profile; the harness makes that cheap. Full tables, the formula, and every gated config with its reason: [Leaderboard](#leaderboard).
 
 **TL;DR, why this exists.**
 
