@@ -6,24 +6,24 @@
 
 **What does a correct answer actually cost an enterprise on each LLM?**
 
-Every provider bills you per token. What you actually buy is correct outcomes, and in a business workflow a wrong outcome is not free: it flows downstream, corrupts the result that ships, and someone has to catch and redo it. This benchmark prices what matters, the cost of a *trusted* answer, tokens plus the business risk of the errors.
+Providers bill you per token. What you actually buy is *correct outcomes*, and a wrong one is not free: it flows downstream into a report or an invoice, and someone has to catch and fix it. This benchmark prices the thing that matters, the cost of a **trusted** answer.
 
-Here is the problem in one picture. Two models run the same back-office workflow, ten short steps long (read a ledger, chain some arithmetic, tabulate a total), each step no harder than middle-school math but the chain is long:
+**One concrete example.** Say you automate 1 million back-office workflows a month, each about 20 short steps a person could do on a computer: read a ledger, do the arithmetic, tabulate a total.
 
-- **Model A** costs a little more per token and gets every step right. A correct total, every run.
-- **Model B** is cheaper per token but slips on one run in five: four totals right, one silently wrong.
+- **Opus 4.8** gets 92% right, at about **\$0.016 per correct answer**.
+- **Haiku 4.5** looks half the price at **\$0.007 per correct answer**, but only gets 74% right.
 
-On the token bill, Model B looks cheaper. But that one wrong total in twenty does not announce itself. It lands in a report, a reconciliation, an invoice, and the cost to detect and fix it dwarfs the token savings. Price that risk in and Model B is far more expensive per trusted answer. That gap is what this benchmark measures, per model, in dollars.
+The sticker says Haiku is cheaper. Reality: Haiku's wrong answers do not announce themselves. Each one lands in a report someone must catch and redo, and one bad number in a financial close costs far more than the pennies saved. Once you price that cleanup in, for the same million workflows **Opus costs about \$29K a month and Haiku about \$2.9M a month**, 100x more, for looking "cheaper."
 
-**Why enterprise work looks like this.** Most business tasks are simple per step (tabulate a table, apply a pricing rule, run a short calculation) but chained long, and the failure that costs money is the one at the *end* of the chain, because that is the number that ships. So we score correctness and cost together and penalize errors superlinearly: one slip is tolerable, but a model that fails several times in twenty is a liability no matter how cheap its tokens, because each failure is a cleanup cost, not a discount.
+That gap is what this benchmark measures: not the price per token, but the dollar cost of a trusted answer at scale.
 
-**Recommendation.** Ranked by risk-adjusted `$/correct` (the cost of a trusted answer), calibrated for the deep multi-step workflows enterprises actually run:
+**Recommendation**, ranked by that true cost, for the deep multi-step work enterprises actually run:
 
-1. **`anthropic:claude-opus-4-8`**: most reliable on long chains, and cheapest once risk is priced in.
+1. **`anthropic:claude-opus-4-8`**: most reliable on long chains, cheapest once risk is priced in.
 2. `anthropic:claude-fable-5`
 3. `openai:gpt-5.5`
 
-For shallow, everyday tasks the cheaper tier wins instead (`moonshot:kimi-k2.5#thinking=off`, then `openai:gpt-5.4#effort=low`). Treat this as a starting shortlist, then run your own workload's depth profile; the harness makes that cheap. Full tables, the formula, and every gated config with its reason: [Leaderboard](#leaderboard).
+Shallow everyday tasks flip the ranking toward cheaper models (`moonshot:kimi-k2.5#thinking=off`, then `openai:gpt-5.4#effort=low`). Treat this as a shortlist, then run your own workload; the harness makes that cheap. Full board and method: [Leaderboard](#leaderboard).
 
 ## Leaderboard
 
@@ -301,7 +301,7 @@ src/token_efficiency_benchmark/
 pricing/prices.json   # versioned $/Mtok price sheet
 scripts/run_eval.py   # resumable concurrent evaluator
 docs/                 # design docs and worked examples
-tests/                # 73 tests, all offline
+tests/                # offline test suite (ruff + mypy strict + pytest in CI)
 ```
 
 ## Future work
