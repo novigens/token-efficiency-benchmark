@@ -118,3 +118,14 @@ def test_client_for_spec_thinking_off():
 
     with _pytest.raises(ValueError):
         client_for_spec("openai:gpt-5.4#thinking=off", http_call=stub)
+
+
+def test_moonshot_stream_env_preserves_model_name(monkeypatch):
+    from token_efficiency_benchmark.evaluation.live_models import client_for_spec
+
+    monkeypatch.setenv("TEB_MOONSHOT_STREAM", "1")
+    monkeypatch.setenv("TEB_MOONSHOT_MAX_TOKENS", "65536")
+    client = client_for_spec("moonshot:kimi-k2.5", http_call=StubResponse(text="1"))
+    assert client.name == "moonshot:kimi-k2.5"
+    assert client._stream is True
+    assert client._max_output_tokens == 65536

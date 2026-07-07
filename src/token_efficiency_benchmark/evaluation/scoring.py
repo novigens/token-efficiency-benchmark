@@ -28,7 +28,8 @@ from ..types import CompositeTask, ModelResponse, TaskResult
 #: Default cost weights matching common provider pricing (w_out is ~4x w_in).
 DEFAULT_WEIGHTS: tuple[float, float] = (1.0, 4.0)
 
-_INT_PATTERN = re.compile(r"-?\d+")
+_INT_PATTERN = re.compile(r"-?(?:\d{1,3}(?:[,\uff0c\u00a0\u202f]\d{3})+|\d+)")
+_INTEGER_GROUP_SEPARATORS = str.maketrans({"\uff0c": "", ",": "", "\u00a0": "", "\u202f": ""})
 
 
 def parse_integer_answer(response_text: str) -> str | None:
@@ -44,7 +45,7 @@ def parse_integer_answer(response_text: str) -> str | None:
     matches = _INT_PATTERN.findall(response_text)
     if not matches:
         return None
-    return str(int(matches[-1]))
+    return str(int(matches[-1].translate(_INTEGER_GROUP_SEPARATORS)))
 
 
 def compute_efficiency(

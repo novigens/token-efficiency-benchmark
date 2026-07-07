@@ -15,5 +15,6 @@
   "anthropic:claude-fable-5": {"in": 10.00, "out": 50.00},
   "anthropic:claude-opus-4-8": {"in": 5.00, "out": 25.00},
   "anthropic:claude-sonnet-5": {"in": 2.00, "out": 10.00},
-  "anthropic:claude-haiku-4-5": {"in": 1.00, "out": 5.00}
+  "anthropic:claude-haiku-4-5": {"in": 1.00, "out": 5.00},
+  "deepseek:deepseek-v4-pro": {"in": 0.435, "out": 0.87}
 }

@@ -23,6 +23,13 @@ def test_parse_integer_answer_picks_last_integer():
     assert parse_integer_answer("step 1, step 2, result 7") == "7"
 
 
+def test_parse_integer_answer_accepts_grouped_final_answer():
+    assert parse_integer_answer("Difference: 463,949") == "463949"
+    assert parse_integer_answer("Difference: 463\uff0c949") == "463949"
+    assert parse_integer_answer("Difference: 185\u202f805") == "185805"
+    assert parse_integer_answer("Difference: 185\u00a0805") == "185805"
+
+
 def test_compute_efficiency_bounded_in_zero_one():
     eff = compute_efficiency(
         v_star_input_tokens=100,

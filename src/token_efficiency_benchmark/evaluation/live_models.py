@@ -19,7 +19,25 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
-MOONSHOT_BASE_URL = "https://api.moonshot.ai/v1"
+MOONSHOT_BASE_URL = "https://api.moonshot.cn/v1"
+DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+
+
+def _env_flag(name: str, *, default: bool = False) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_int(name: str, *, default: int) -> int:
+    value = os.environ.get(name)
+    if value is None or not value.strip():
+        return default
+    try:
+        return int(value)
+    except ValueError as e:
+        raise ValueError(f"{name} must be an integer, got {value!r}") from e
 
 
 @dataclass(frozen=True)
@@ -48,6 +66,7 @@ class OpenAICompatClient:
         token_param: str = "max_tokens",  # OpenAI reasoning models need "max_completion_tokens"
         reasoning_effort: str | None = None,  # OpenAI: enable thinking (low/medium/high)
         thinking_disabled: bool = False,  # Moonshot: instant mode (thinking off)
+        stream: bool = False,
         timeout_s: float = 300.0,
         http_call: Any = None,
     ) -> None:
@@ -58,6 +77,7 @@ class OpenAICompatClient:
         self._token_param = token_param
         self._reasoning_effort = reasoning_effort
         self._thinking_disabled = thinking_disabled
+        self._stream = stream
         self._timeout_s = timeout_s
         self._api_key = api_key or os.environ.get(api_key_env)
         self._base_url = base_url
@@ -81,6 +101,18 @@ class OpenAICompatClient:
             ) from e
 
         client = OpenAI(api_key=self._api_key, base_url=self._base_url)
+        kwargs = self._request_kwargs()
+        if self._stream:
+            return self._generate_streaming(client, prompt, kwargs)
+        completion = client.chat.completions.create(
+            model=self._model,
+            messages=[{"role": "user", "content": prompt}],
+            timeout=self._timeout_s,
+            **kwargs,
+        )
+        return self._output_from_completion(completion)
+
+    def _request_kwargs(self) -> dict[str, Any]:
         kwargs: dict[str, Any] = {self._token_param: self._max_output_tokens}
         if self._temperature is not None:
             kwargs["temperature"] = self._temperature
@@ -88,15 +120,61 @@ class OpenAICompatClient:
             kwargs["reasoning_effort"] = self._reasoning_effort
         if self._thinking_disabled:
             kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
-        completion = client.chat.completions.create(
+        return kwargs
+
+    def _output_from_completion(self, completion: Any) -> ModelOutput:
+        message = completion.choices[0].message
+        usage = getattr(completion, "usage", None)
+        return self._model_output(
+            text=message.content or "",
+            usage=usage,
+            finish_reason=completion.choices[0].finish_reason,
+            reasoning_content=getattr(message, "reasoning_content", None),
+            streamed=False,
+        )
+
+    def _generate_streaming(self, client: Any, prompt: str, kwargs: dict[str, Any]) -> ModelOutput:
+        stream = client.chat.completions.create(
             model=self._model,
             messages=[{"role": "user", "content": prompt}],
             timeout=self._timeout_s,
+            stream=True,
+            stream_options={"include_usage": True},
             **kwargs,
         )
-        message = completion.choices[0].message
-        text = message.content or ""
-        usage = getattr(completion, "usage", None)
+        parts: list[str] = []
+        reasoning_parts: list[str] = []
+        usage: Any = None
+        finish_reason: str | None = None
+        for chunk in stream:
+            usage = getattr(chunk, "usage", None) or usage
+            for choice in getattr(chunk, "choices", []) or []:
+                usage = getattr(choice, "usage", None) or usage
+                finish_reason = getattr(choice, "finish_reason", None) or finish_reason
+                delta = getattr(choice, "delta", None)
+                content = getattr(delta, "content", None) if delta is not None else None
+                if isinstance(content, str) and content:
+                    parts.append(content)
+                reasoning = getattr(delta, "reasoning_content", None) if delta is not None else None
+                if isinstance(reasoning, str) and reasoning:
+                    reasoning_parts.append(reasoning)
+        return self._model_output(
+            text="".join(parts),
+            usage=usage,
+            finish_reason=finish_reason,
+            reasoning_content="".join(reasoning_parts) or None,
+            streamed=True,
+        )
+
+    def _model_output(
+        self,
+        *,
+        text: str,
+        usage: Any,
+        finish_reason: str | None,
+        reasoning_content: str | None,
+        streamed: bool,
+    ) -> ModelOutput:
         in_tok = getattr(usage, "prompt_tokens", None) if usage else None
         out_tok = getattr(usage, "completion_tokens", None) if usage else None
         details = getattr(usage, "completion_tokens_details", None) if usage else None
@@ -106,10 +184,11 @@ class OpenAICompatClient:
             input_tokens=in_tok,
             output_tokens=out_tok,
             metadata={
-                "provider_usage": True,
+                "provider_usage": usage is not None,
                 "reasoning_tokens": reasoning,
-                "finish_reason": completion.choices[0].finish_reason,
-                "reasoning_content": getattr(message, "reasoning_content", None),
+                "finish_reason": finish_reason,
+                "reasoning_content": reasoning_content,
+                "streamed": streamed,
             },
         )
 
@@ -121,12 +200,35 @@ class OpenAIClient(OpenAICompatClient):
 
 
 class MoonshotClient(OpenAICompatClient):
-    """Moonshot (Kimi) — OpenAI-compatible endpoint, MOONSHOT_API_KEY."""
+    """Moonshot (Kimi) — OpenAI-compatible endpoint, MOONSHOT_API_KEY.
+
+    Kimi API notes (from platform.kimi.com/docs):
+    - Use ``max_tokens`` (NOT ``max_completion_tokens``).
+    - Thinking + answer share a single budget; ``max_tokens >= 16000`` recommended.
+    - Do NOT set ``temperature`` — it is locked by the provider.
+    - Set ``TEB_MOONSHOT_STREAM=1`` to use streaming without changing the
+      result row name; Kimi recommends streaming for benchmark reliability.
+    """
 
     def __init__(self, *, model: str, **kwargs: Any) -> None:
         kwargs.setdefault("base_url", MOONSHOT_BASE_URL)
         kwargs.setdefault("api_key_env", "MOONSHOT_API_KEY")
+        kwargs.setdefault("token_param", "max_tokens")
+        kwargs.setdefault(
+            "max_output_tokens",
+            _env_int("TEB_MOONSHOT_MAX_TOKENS", default=32768),
+        )
+        kwargs.setdefault("stream", _env_flag("TEB_MOONSHOT_STREAM"))
         super().__init__(model=model, name_prefix="moonshot", **kwargs)
+
+
+class DeepSeekClient(OpenAICompatClient):
+    """DeepSeek — OpenAI-compatible endpoint, DEEPSEEK_API_KEY."""
+
+    def __init__(self, *, model: str, **kwargs: Any) -> None:
+        kwargs.setdefault("base_url", DEEPSEEK_BASE_URL)
+        kwargs.setdefault("api_key_env", "DEEPSEEK_API_KEY")
+        super().__init__(model=model, name_prefix="deepseek", **kwargs)
 
 
 class AnthropicClient:
@@ -245,6 +347,7 @@ def client_for_spec(spec: str, *, timeout_s: float | None = None, **kwargs: Any)
         "moonshot": MoonshotClient,
         "openai": OpenAIClient,
         "anthropic": AnthropicClient,
+        "deepseek": DeepSeekClient,
     }
     if provider not in classes:
         raise ValueError(f"unknown provider '{provider}' in spec '{spec}'")
