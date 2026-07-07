@@ -29,24 +29,24 @@ For shallow, everyday tasks the cheaper tier wins instead (`moonshot:kimi-k2.5#t
 
 ### Business ranking, risk-adjusted `$/correct` (2026-07-06, paired depth ladder)
 
-| # | model (exact config) | acc | eff | `$/correct` | risk-adj `$/correct` | note |
-|--:|----------------------|----:|-----:|------------:|---------------------:|------|
-| 🏆 | **Human** (Ideal: the bare correct answer) | **100%** | **100%** | **~\$0.0** | **~\$0.0** | the V\* floor |
-| 1 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | **\$0.02862** | most trap-resistant on the board |
-| 2 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | **\$0.235** | no refusals this run |
-| 3 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | **\$0.933** | |
-| 4 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | |
-| 5 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | |
-| 6 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | |
-| 7 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | |
-| 8 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | pruned at depth 9 |
-| 9 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | pruned at depth 6 |
-| - | `deepseek:deepseek-v4-pro` | 76% | 4.97% | \$0.00391 | (\$0.668) | gated: 4.97% efficiency, just under the 5% floor |
-| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | gated: 1.46% efficiency, too slow to wait for |
-| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | gated: 1.83% efficiency, too slow to wait for |
-| - | `openai:gpt-5.4` (default, reasoning off) | 0% | - | n/a | n/a | no correct answers; pruned at depth 3 |
+| # | model (exact config) | acc | eff | `$/correct` | risk-adj `$/correct` | **cost / 1M workflows / mo** | note |
+|--:|----------------------|----:|-----:|------------:|---------------------:|-----------------------------:|------|
+| 🏆 | **Human** (Ideal: the bare correct answer) | **100%** | **100%** | **~\$0.0** | **~\$0.0** | **~\$0** | the V\* floor |
+| 1 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | **\$0.02862** | **\$28.6K** | most trap-resistant on the board |
+| 2 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | **\$0.235** | **\$234.9K** | no refusals this run |
+| 3 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | **\$0.933** | **\$933.5K** | |
+| 4 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | \$1.29M | |
+| 5 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | \$2.70M | |
+| 6 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | \$2.86M | |
+| 7 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | \$30.6M | |
+| 8 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | unusable | pruned at depth 9 |
+| 9 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | unusable | pruned at depth 6 |
+| - | `deepseek:deepseek-v4-pro` | 76% | 4.97% | \$0.00391 | (\$0.668) | (\$668.3K) | gated: 4.97% efficiency, just under the 5% floor |
+| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | (\$6.9M) | gated: 1.46% efficiency, too slow to wait for |
+| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | (\$58.6M) | gated: 1.83% efficiency, too slow to wait for |
+| - | `openai:gpt-5.4` (default, reasoning off) | 0% | - | n/a | n/a | n/a | no correct answers; pruned at depth 3 |
 
-`acc` is accuracy on the 50 tasks each survivor saw; `eff` is mean token efficiency; `$/correct` is raw dollars per correct answer; **risk-adj `$/correct`** is the buying number, raw `$/correct` divided by 0.8^(k²) where k is wrong answers per 20 tasks (one wrong keeps 80% of value, two keep 41%, three 13%, four 3%). There is deliberately no hard cutoff for wrong-answer risk; the exponential penalty lets hopeless configs fall off the bottom naturally, and a price of \$10^14 per trusted answer reads as the verdict it is. The efficiency gate is a constraint, not a weight: a config below 5% mean efficiency (DeepSeek by a whisker at 4.97%, Kimi's default thinking modes by a mile) is flagged as too slow or wasteful to wait for, whatever it costs, and drops below the ranked rows. This board is a deep-stress test: the paired ladder (run `20260706T222112Z_412022-paired`) extends five shared problems from depth 3 to depth 30, so accuracies sit far below the everyday board and one persistent distractor trap accounts for many of the wrongs of most survivors. Weak configs are pruned mid-ladder by pre-registered rules, so they saw fewer tasks (noted per row); full per-row counts are in `teb compare`. The `#thinking=off` Moonshot variants that top the everyday board sat out this run for US serving latency. Reproduce with `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. This ranking openly needs statistically stronger samples; scaling it is a community-sized job the harness makes cheap.
+**cost / 1M workflows / mo** = risk-adj `$/correct` × 1,000,000: the monthly bill to run a million of these workflows on that model, cleanup of wrong answers priced in. Same work, same month: Opus 4.8 costs **\$28.6K**, GPT-5.5 **\$933.5K**, a 33x spread. A perfect human doing them on a computer needs zero tokens, so the floor is effectively \$0; the LLM cost is what you pay for scale. Method, formula, gates, and full per-row counts: [`ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
 
 ### Raw metrics (first public run, 2026-07-03)
 
@@ -66,9 +66,7 @@ For shallow, everyday tasks the cheaper tier wins instead (`moonshot:kimi-k2.5#t
 | 11 | `moonshot:kimi-k2.6` (default thinking) | 95% | \$0.03418 | 77.8x | 1.8% | 8,015 |
 | 12 | `anthropic:claude-fable-5` | 75% | \$0.03530 | 5.0x | 17.2% | 407 |
 
-n = 20 tasks per row, ranked by `$/correct`; 🥇 marks the best model per metric. The Human row wins every column and is the V\* floor: a person who works it out on scratch paper and hands back one number. Humans do not bill for their thinking; these models do.
-
-First public run, July 3, 2026: twelve model configurations against the same 20 fresh hybrid-gauntlet tasks (code → narrative → table, at depths 3 and 6), single worker, provider-reported token counts, prices per [`pricing/prices.json`](pricing/prices.json). Every question, raw response, reasoning trace, and knob setting ships in [`benchmark_data/runs/20260703T070656Z_098392/`](benchmark_data/runs/20260703T070656Z_098392/): `manifest.json` records the exact API parameters per row, `VALIDATION.md` the pre-flight probes, and `ANALYSIS.md` the independent audit of these numbers.
+n = 20 tasks per row, ranked by `$/correct`; 🥇 = best per metric; the Human row is the V\* floor (humans do not bill for their thinking; these models do). Full run detail, evidence, and audit: [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
 
 **Key findings.** One line each here; evidence, autopsies, and extended commentary live in [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
 

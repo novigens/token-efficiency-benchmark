@@ -33,3 +33,14 @@
 - **Honest update to the pre-registered prediction.** The strong form (plan-selectors break by depth 10 to 14) is wrong for this tier on these chains; what holds is the cost form: accuracy survives, waste stays flat-rate and far above ideal, and error behavior is dominated by persistent traps rather than depth.
 
 Caveats: five groups per rung; one bait-broken group pins most models at 80% forever, so the effective depth-sensitivity sample is four groups. More groups is the follow-up; task set and every response are in this directory for replay.
+
+
+## How to read this board (method notes)
+
+- **acc** is accuracy on the 50 tasks each surviving config saw; **eff** is mean token efficiency; **$/correct** is raw dollars per correct answer.
+- **risk-adj $/correct** is the buying number: raw $/correct divided by 0.8^(k^2), k = wrong answers per 20 tasks. One wrong keeps 80% of value, two 41%, three 13%, four 3%. There is no hard unusability cutoff; the exponential penalty lets hopeless configs price themselves into the billions per trusted answer.
+- **cost / 1M workflows / mo** = risk-adj $/correct x 1,000,000, the monthly bill to run a million of these workflows with wrong-answer cleanup priced in.
+- **Efficiency gate** (a constraint, not a weight): a config below 5% mean efficiency is flagged as too slow or wasteful to wait for and drops below the ranked rows (DeepSeek at 4.97% just under; Kimi's default thinking modes far under).
+- **Why n varies**: weak configs are pruned mid-ladder by the pre-registered rules in `scripts/run_depth_ladder.py`, so they saw fewer tasks (gpt-5.4-nano 15, gpt-4.1-nano 10, gpt-5.4 default 5).
+- **Moonshot #thinking=off** variants that top the everyday board sat out this run for US serving latency; the two default-thinking Moonshot rows that did run are gated for efficiency.
+- **Reproduce**: `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. The ranking needs statistically stronger samples than five groups; scaling it is a community-sized job the harness makes cheap.
