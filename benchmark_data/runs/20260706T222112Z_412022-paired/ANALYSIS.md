@@ -44,3 +44,11 @@ Caveats: five groups per rung; one bait-broken group pins most models at 80% for
 - **Why n varies**: weak configs are pruned mid-ladder by the pre-registered rules in `scripts/run_depth_ladder.py`, so they saw fewer tasks (gpt-5.4-nano 15, gpt-4.1-nano 10, gpt-5.4 default 5).
 - **Moonshot #thinking=off** variants that top the everyday board sat out this run for US serving latency; the two default-thinking Moonshot rows that did run are gated for efficiency.
 - **Reproduce**: `teb compare --results benchmark_data/runs/20260706T222112Z_412022-paired/results.jsonl --pricing pricing/prices.json --business`. The ranking needs statistically stronger samples than five groups; scaling it is a community-sized job the harness makes cheap.
+
+
+## By vendor and by price (deep board)
+
+- **Anthropic's Claude family led**: Opus 4.8 (risk-adj $0.0286, acc 92%, eff 21.9%), Fable 5 ($0.235, 86%), Sonnet 5 ($1.286, 78%), Haiku 4.5 ($2.862, 74%) took four of the top six risk-adjusted slots. The lead is an accuracy effect on long chains, not an efficiency one: GPT-5.4-low (28.3%) and GPT-5.5 (22.1%) are the most token-efficient rows.
+- **Cheapest per token ranked worst.** Ordered by output price, the two cheapest models on the sheet are gpt-4.1-nano ($0.10/$0.40, dead last, acc 20%) and deepseek-v4-pro ($0.43/$0.87, gated). All three Chinese configs that ran (DeepSeek 4.97% eff, Kimi K2.5 1.46%, Kimi K2.6 1.83%, all default-thinking) fell at or below the 5% efficiency gate despite competitive accuracy (DeepSeek 76%, matching GPT-5.4-medium). They spent their per-token advantage 20x to 60x over on tokens per answer.
+- **Caveat**: on the shallow everyday board (2026-07-03), kimi-k2.5#thinking=off was the value leader. The Kimi instant variants were not re-run on the deep board (US serving latency), so the deep-board weakness is a default-thinking + long-chain effect, not a blanket ranking. And Anthropic is not favored by construction: on the shallow board Fable 5 ranked last and refused 5 of 20 tasks.
+- **Universal gap**: the best config (Opus, 92% / eff 21.9%) still runs at roughly 5x the ideal token cost and below 100% accuracy. No model approached the human floor on these chains.
