@@ -55,6 +55,20 @@ This also explains the olympiad paradox without disputing the results. Gold-meda
 
 The ask to the frontier labs follows directly, and it is not rhetorical: per-step credit assignment, search over the problem's semantic states rather than over sampled text, and cost inside the objective are all known techniques with literatures behind them (an active one, in the case of length-penalized RL). Choosing the compromise is a legitimate engineering decision. We claim no intent about what follows: pay-per-token billing with hidden reasoning simply means the seller's revenue rises with waste the buyer cannot inspect, a structural conflict that survives wherever waste goes unmeasured. Charging customers for the compromise's token overhead while calling it reasoning is the part this benchmark makes visible, and measurable.
 
+## But production adds guardrails and agents
+
+The strongest objection to a single-shot benchmark is that real deployments do not run models single-shot: they wrap them in validators, retries, self-consistency voting, and step-by-step agentic checks that catch errors before they ship. True. But self-correction does not escape the cost-of-risk structure this benchmark measures; it is governed by it.
+
+Three points, and one real exception.
+
+First, the checker is usually the same class of model with the same competence on the same hard step. A critic that is wrong 24% of the time does not reliably catch a generator that is wrong 24% of the time, and their errors are correlated (same training, same blind spots, same distractor that fools both). The accuracy gain from a same-model critic is real but bounded, and it is not the free reliability the objection assumes.
+
+Second, every validation pass, retry, and voting sample is more tokens, hence more dollars. A loop that raises accuracy from 76% to 95% by tripling the token spend has not left the frontier; it has traded position on it, buying correctness with cost. That trade is exactly what risk-adjusted `$/correct` prices. An agent is a composition of the single-shot primitive, and it inherits the primitive's cost structure: its errors still cost cleanup, its passes still cost tokens.
+
+Third, because of the first two, an agentic pipeline is measured the same way as a bare model: treat the whole loop as the unit under test, return its final answer and its total billed tokens, and read its risk-adjusted `$/correct` on the same board. The harness does not care whether one call or forty produced the answer. The single-shot leaderboard is the primitive; the agentic number is a point on the same curve, and usually a more expensive one.
+
+The one genuine escape is a cheap deterministic verifier: unit tests for generated code, a recomputation of an arithmetic result, a schema check. Where such an oracle exists, a loop can drive effective accuracy toward 100% cheaply, because the checker is not a fallible LLM. But that is also the retry-economics assumption spelled out under the metric: it requires that wrong answers are detectable for free. For the workflows that dominate enterprise back offices, the judgment "is this reconciled total correct?" is itself the hard step, with no cheap oracle, so the loop's checker is another fallible model call and the structure holds. Where you do have a deterministic verifier, use it, and report the verified pipeline's number; the benchmark will happily price it.
+
 ## Why this is not just another leaderboard
 
 Four properties, individually precedented, jointly not: tasks generated at runtime and replayable byte-for-byte from a seed (nothing to memorize or distill); every task anchored to its own optimal cost V*, so waste is measured against the problem rather than against other models; token counts taken from provider billing, hidden thinking included; and zero credit for wrong answers regardless of cost. The nearest neighbor, Cost-of-Pass, shares the economic quantity and runs on static public test sets. See [`related_work.md`](related_work.md) for the full map.

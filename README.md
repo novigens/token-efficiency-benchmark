@@ -188,6 +188,8 @@ Same weights as the winners above, one knob apart. Because rows were shortlisted
 
 This benchmark is built to expose exactly those weaknesses, on freshly generated tasks no model can have memorized. And it will keep exposing them until a frontier lab solves reasoning properly, with step-level credit assignment and priced computation rather than patches around them. The proof is simple and open to anyone: ship a model whose cost scales like state tracking, and top this board. The full argument, pinned to evidence rows and references: [`docs/motivation.md`](docs/motivation.md).
 
+**What about guardrails and agentic loops?** A fair objection: production systems add validators, retries, and step-by-step checks. But self-correction does not leave this cost-of-risk frontier, it moves along it. The critic is usually the same class of model with the same error rate, so it catches mistakes imperfectly, and every extra validation or retry pass is more tokens and more dollars. You buy accuracy with spend, which is exactly the trade `risk-adjusted $/correct` prices. So measure the whole loop as one unit: point the harness at your agent and read its risk-adjusted `$/correct` on the same board. The single-shot number is the primitive the loop is built from. The one genuine escape is a cheap deterministic verifier (unit tests, recomputable arithmetic); where you have one, use it and accuracy rises cheaply, but where the check is itself the hard judgment, as in most business decisions, the loop's checker is just another fallible call.
+
 ## Quick start
 
 ```bash
