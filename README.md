@@ -13,46 +13,50 @@ Providers bill you per token. What you actually buy is *correct outcomes*, and a
 - **Opus 4.8** gets 92% right, at about **\$0.016 per correct answer**.
 - **Haiku 4.5** looks half the price at **\$0.007 per correct answer**, but only gets 74% right.
 
-The sticker says Haiku is cheaper. Reality: Haiku's wrong answers do not announce themselves. Each one lands in a report someone must catch and redo, and one bad number in a financial close costs far more than the pennies saved. Once you price that cleanup in, for the same million workflows **Opus costs about \$29K a month and Haiku about \$2.9M a month**, 100x more, for looking "cheaper."
+The sticker says Haiku is cheaper. Reality: Haiku's wrong answers do not announce themselves. Each one lands in a report someone must catch and redo, and one bad number in a financial close costs far more than the pennies saved. Once you price that cleanup in, for the same million workflows **Opus costs about \$29K a month and Haiku about \$2.9M a month**, 100x more, for looking "cheaper." (The board's actual leaders, Kimi K3 and GPT-5.6 Sol, land near \$10K.)
 
 That gap is what this benchmark measures: not the price per token, but the dollar cost of a trusted answer at scale.
 
-**Recommendation**, ranked by that true cost, for the deep multi-step work enterprises actually run:
+**Recommendation.** The two newest frontier models are in a statistical dead heat at the top, both a generational leap over everything else (including their own vendors' prior releases):
 
-1. **`anthropic:claude-opus-4-8`**: most reliable on long chains, cheapest once risk is priced in.
-2. `anthropic:claude-fable-5`
-3. `openai:gpt-5.5`
+- **`moonshot:kimi-k3`** (co-#1): 98% accuracy, the lowest cost per trusted answer, ~\$9.4K per million workflows a month.
+- **`openai:gpt-5.6-sol#effort=medium`** (co-#1): the only 100% on the board, US-hosted, ~\$10.4K.
 
-Shallow everyday tasks flip the ranking toward cheaper models (`moonshot:kimi-k2.5#thinking=off`, then `openai:gpt-5.4#effort=low`). Treat this as a shortlist, then run your own workload; the harness makes that cheap. Full board and method: [Leaderboard](#leaderboard).
+They finish within ~\$1K a month per million workflows, closer than a single run can resolve, so reliability, hosting, and data-residency decide it, not price: Sol for zero-defect runs, K3 for the lowest bill. `anthropic:claude-opus-4-8` is a solid third at 92%. Treat this as a shortlist, then run your own workload; the harness makes that cheap. Full board and method: [Leaderboard](#leaderboard).
 
 ## Leaderboard
 
-### Business ranking, risk-adjusted `$/correct` (2026-07-06, paired depth ladder)
+### Business ranking, risk-adjusted `$/correct` (paired depth ladder run 2026-07-06, models through 2026-07-09)
 
 | # | model (exact config) | acc | eff | `$/correct` | risk-adj `$/correct` | **cost / 1M workflows / mo** | note |
 |--:|----------------------|----:|-----:|------------:|---------------------:|-----------------------------:|------|
 | 🏆 | **Human** (Ideal: the bare correct answer) | **100%** | **100%** | **~\$0.0** | **~\$0.0** | **~\$0** | the V\* floor |
-| 1 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | **\$0.02862** | **\$28.6K** | most trap-resistant on the board |
-| 2 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | **\$0.235** | **\$234.9K** | no refusals this run |
-| 3 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | **\$0.933** | **\$933.5K** | |
-| 4 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | \$1.29M | |
-| 5 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | \$2.70M | |
-| 6 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | \$2.86M | |
-| 7 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | \$30.6M | |
-| 8 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | unusable | pruned at depth 9 |
-| 9 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | unusable | pruned at depth 6 |
+| 1 | `moonshot:kimi-k3` | 98% | 23.39% | \$0.00908 | **\$0.00941** | **\$9.4K** | co-leader · cheapest per trusted answer |
+| 1 | `openai:gpt-5.6-sol#effort=medium` | **100%** | 36.57% | \$0.01042 | **\$0.01042** | **\$10.4K** | co-leader · only 100% on the board |
+| 3 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | \$0.02862 | \$28.6K | |
+| 4 | `moonshot:kimi-k3#thinking=off` | 88% | 20.97% | \$0.01113 | \$0.04026 | \$40.3K | |
+| 5 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | \$0.235 | \$234.9K | |
+| 6 | `openai:gpt-5.6-terra#effort=medium` | 78% | 38.23% | \$0.00641 | \$0.482 | \$482.3K | most efficient, but lower accuracy |
+| 7 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | \$0.933 | \$933.5K | last gen, same price as Sol |
+| 8 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | \$1.29M | |
+| 9 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | \$2.70M | |
+| 10 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | \$2.86M | |
+| 11 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | \$30.6M | |
+| 12 | `openai:gpt-5.6-luna` | 48% | 24.42% | \$0.00670 | \$2.0e+08 | unusable | cheap tier, too many wrong |
+| 13 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | unusable | pruned at depth 9 |
+| 14 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | unusable | pruned at depth 6 |
 | - | `deepseek:deepseek-v4-pro` | 76% | 4.97% | \$0.00391 | (\$0.668) | (\$668.3K) | gated: 4.97% efficiency, just under the 5% floor |
-| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | (\$6.9M) | gated: 1.46% efficiency, too slow to wait for |
-| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | (\$58.6M) | gated: 1.83% efficiency, too slow to wait for |
+| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | (\$6.9M) | gated: last-gen overthinking |
+| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | (\$58.6M) | gated: last-gen overthinking |
 | - | `openai:gpt-5.4` (default, reasoning off) | 0% | - | n/a | n/a | n/a | no correct answers; pruned at depth 3 |
 
-**cost / 1M workflows / mo** = risk-adj `$/correct` × 1,000,000: the monthly bill to run a million of these workflows on that model, cleanup of wrong answers priced in. Same work, same month, Opus 4.8 costs **\$28.6K** and GPT-5.5 **\$933.5K**, a 33x spread. Read it as a make-or-buy line, not just a model ranking: these are workflows a back-office team could process and validate with ordinary computer tools, no LLM in the loop (the Human row). So if staffing that team to run and check a million a month costs you *less* than the cheapest reliable model here (Opus at ~\$28.6K), keep the human-plus-computer workflow or go hybrid; LLM automation only pays when it is both reliable and cheaper than that at your scale. Method, formula, gates, and full per-row counts: [`ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
+The two newest frontier models, `kimi-k3` and `gpt-5.6-sol`, are co-ranked #1: their risk-adjusted costs sit within ~10% of each other, closer than the margin of error of a single 50-task run, so we call it a tie rather than split hairs (K3 the lowest bill, Sol the only 100%). Both are a generational leap ahead of everything else, including their own vendors' prior models. **cost / 1M workflows / mo** = risk-adj `$/correct` × 1,000,000: the monthly bill to run a million of these workflows, cleanup of wrong answers priced in. The cleanest illustration is within one vendor: OpenAI's GPT-5.6 Sol and GPT-5.5 are priced identically per token, yet Sol runs a million workflows for **\$10.4K** at 100% and GPT-5.5 for **\$933.5K** at 80%, a ~90x gap, one generation apart. Read the board as a make-or-buy line too: these are workflows a back-office team could process and validate with ordinary computer tools, no LLM in the loop (the Human row), so if staffing that team costs *less* than the cheapest reliable model here (~\$9.4K a month), keep the human-plus-computer workflow or go hybrid. Method, formula, gates, and full per-row counts: [`ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
 
 ![Accuracy and cost per correct answer versus depth 3 to 30 on the paired ladder, with the ideal V* floor marked](benchmark_data/runs/20260706T222112Z_412022-paired/depth_scaling_paired.png)
 
 How depth separates them, now with real curves (paired ladder, 2026-07-06): through depth 30 the frontier tier shows no accuracy cliff, and the flat 80% lines are one bait-broken group, not depth. The weak tier collapses and is pruned on schedule. On the cost side nobody approaches the ideal floor at any depth: waste is a flat-rate tax, sitting 20 to 60x above V* from depth 3 all the way to depth 30. Full curves, the 77-parcel exhibit, and the honest outcome of our pre-registered depth prediction: [paired `ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
 
-> **Reproducibility disclaimer.** These are single-run numbers, five shared problems per depth: directional, not definitive. LLM outputs vary run to run, sometimes a lot. The same Fable 5 refused 5 of 20 tasks (25%) on the earlier 2026-07-03 board yet refused none here, which alone can swing a ranking. Numbers this close need repeated sampling before they are repeatable and reproducible. Treat this board as a shortlist and a method, not a verdict, and reproduce with your own sample size before you procure.
+> **Reproducibility disclaimer.** These are single-run numbers, five shared problems per depth: directional, not definitive. The two co-leaders finish within ~10% on cost, well inside the margin of error of a 50-task run, so read them as tied, not ordered. LLM outputs also vary run to run: the same Fable 5 refused 5 of 20 tasks (25%) on the earlier 2026-07-03 board yet refused none here, which alone can swing a ranking. Kimi K3 and GPT-5.6 were both released in July 2026 and evaluated on the existing task set, so they had no more exposure to it than any other model, but they are the freshest and least-sampled rows. Numbers this close need repeated sampling before they are repeatable. Treat this board as a shortlist and a method, not a verdict, and reproduce with your own sample size before you procure.
 
 Rows for Gemini, Grok, Qwen, DeepSeek, and the rest of the field are welcome through the same client (see [Extending](#extending)), provided each ships its full run directory as evidence; scaling the sample count is a community-sized job the harness makes cheap.
 
@@ -140,53 +144,15 @@ Aggregate those three behaviors over hundreds of fresh tasks per difficulty leve
 
 ## Findings and evidence
 
-The full audit, autopsies, and commentary live in each run's `ANALYSIS.md`. The highlights:
+The full audit, autopsies, and commentary live in the run's `ANALYSIS.md`. The current highlights, each with its caveat:
 
-**Why raw `$/correct` alone misleads.** An earlier, shallower run (2026-07-03, twelve configs, depths 3 and 6) ranks very differently, because raw `$/correct` prices retries and assumes wrong answers are caught. The two nanos top it at 40 to 45% accuracy, which is the trap the business board fixes: with no oracle to catch them, a 40%-accurate model is not cheap, it is unusable.
-
-| # | model (exact config) | acc | \$/correct | waste | token-eff | out-tok |
-|--:|----------------------|----:|-----------:|------:|----------:|--------:|
-| 🏆 | **Human** (Ideal, the `echo` fixture: the bare correct answer) | **100%** | **~\$0.0** | **0x** | **100%** | **2** |
-| 1 | `openai:gpt-4.1-nano` | 45% | 🥇 \$0.00108 | 11.2x | 8.7% | 1,109 |
-| 2 | `openai:gpt-5.4-nano` | 40% | \$0.00184 | 5.4x | 15.8% | 520 |
-| 3 | `moonshot:kimi-k2.5#thinking=off` | 100% | \$0.00217 | 6.1x | 14.4% | 637 |
-| 4 | `moonshot:kimi-k2.6#thinking=off` | 90% | \$0.00395 | 7.3x | 12.7% | 787 |
-| 5 | `anthropic:claude-haiku-4-5` | 80% | \$0.00520 | 7.0x | 12.6% | 734 |
-| 6 | `openai:gpt-5.4#effort=low` | 95% | \$0.00673 | 🥇 3.3x | 🥇 24.7% | 355 |
-| 7 | `openai:gpt-5.4#effort=medium` | 100% | \$0.00958 | 5.6x | 16.8% | 568 |
-| 8 | `anthropic:claude-opus-4-8` | 95% | \$0.01380 | 4.1x | 20.1% | 402 |
-| 9 | `anthropic:claude-sonnet-5` (defaults) | 90% | \$0.01396 | 11.1x | 8.5% | 1,134 |
-| 10 | `openai:gpt-5.5` | 95% | \$0.01539 | 3.8x | 21.9% | 416 |
-| 11 | `moonshot:kimi-k2.6` (default thinking) | 95% | \$0.03418 | 77.8x | 1.8% | 8,015 |
-| 12 | `anthropic:claude-fable-5` | 75% | \$0.03530 | 5.0x | 17.2% | 407 |
-
-n = 20 tasks per row, ranked by `$/correct`; 🥇 = best per metric; the Human row is the V\* floor (humans do not bill for their thinking; these models do). Full run detail, evidence, and audit: [`ANALYSIS.md`](benchmark_data/runs/20260703T070656Z_098392/ANALYSIS.md).
-
-**More from that run, one line each:**
-
-- **A 33x spread on identical questions.** One correct answer costs between \$0.0011 and \$0.0353 depending on which configuration you ask.
-- **Cheap-and-wrong tops retry economics, and risk pricing resolves it.** The nanos lead raw `$/correct` at 40 to 45% accuracy because that metric prices retries, which assumes wrong answers are detectable. The risk-adjusted column makes the business judgment explicit: the nanos price in the trillions of dollars per trusted answer.
-- **The cheapest clean sheet is a knob, not a flagship.** `kimi-k2.5#thinking=off` scores 100% at \$0.0022 per correct. The quiet star is `gpt-5.4#effort=low`: 95% with the board's best waste (3.3x) and token efficiency (24.7%).
-- **The thinking dial has vendor-specific exchange rates.** GPT-5.4 low to medium buys the last 5 accuracy points for 1.4x the money; Kimi K2.6 off to on buys the same 5 points for 8.7x, at 77.8x waste and one death against the output cap.
-- **The newest, priciest flagships rank worst per dollar.** The five most recent premium releases (Opus 4.8, Sonnet 5, GPT-5.5, Kimi K2.6, Fable 5) fill the five worst `$/correct` ranks on the board.
-- **Middle-school tasks, olympiad-grade models, real failures.** Every task is hand-verifiable with middle-school math, in the same season as gold-medal IMO and IOI results and beyond-PhD GPQA scores ([OpenAI](https://x.com/OpenAI/status/1946594928945148246), [DeepMind](https://deepmind.google/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/), [IOI 2025](https://the-decoder.com/openais-ai-system-wins-a-gold-medal-level-score-at-the-international-olympiad-in-informatics-2025/), [GPQA](https://openai.com/index/learning-to-reason-with-llms/)). On this board, a single 63-parcel distractor sentence took down 8 of 12 configurations, and the priciest model refused 5 of 20 tasks outright.
-- **Buyers already suspected it.** Alex Karp on CNBC: these models "have been completely, irresponsibly, oversold" ([CNBC, July 2026](https://www.cnbc.com/2026/07/01/palantir-karp-open-ai-anthropic-tokens.html)). This benchmark is a measuring instrument for that claim.
-
-Two more from the deep paired board (2026-07-06), stated with their caveats:
-
-- **The Claude family led the deep chains; the cheapest tokens ranked worst.** Anthropic's Claude models took four of the top six risk-adjusted slots (Opus 4.8 first, Fable 5 second), on the strength of the highest accuracy on long chains. The lowest-per-token models ranked at or near the bottom: OpenAI's `gpt-4.1-nano` (absolute cheapest, dead last) and all three Chinese configs that ran, `deepseek-v4-pro` and `kimi-k2.5`/`k2.6` in default-thinking mode, which were gated for efficiency. Not for inaccuracy (DeepSeek matched `gpt-5.4#effort=medium` at 76%) but for spending 20x to 60x the ideal token budget per answer. Cheap tokens did not buy cheap outcomes on deep chains. The caveat matters: on the shallow everyday board, `kimi-k2.5#thinking=off` was the value leader, so this is a deep-chain-plus-default-thinking effect, not a standing national gap; the Kimi instant variants were not re-run here (latency). And the benchmark is not partial to Anthropic: on the shallow board a Claude model (Fable 5) ranked last and refused a quarter of its tasks.
-- **Everyone is far from the human floor.** The best config, Opus 4.8, still sat at 92% accuracy and roughly 5x the ideal token cost. No model, US or Chinese, cheap or premium, came close to an ideal human on these chains. The chain-reasoning gap is universal; the ranking is only about who wastes less getting there.
-
-**Failing configs, listed rather than hidden.** Two *default* configurations failed the shared pre-flight probe task and were excluded from the paid run; the raw API transcripts are in [`VALIDATION.md`](benchmark_data/runs/20260703T070656Z_098392/VALIDATION.md):
-
-| excluded config | probe result | failure mode |
-|-----------------|--------------|--------------|
-| `moonshot:kimi-k2.5` (default, thinking on) | no answer returned | found the correct answer mid-reasoning, kept second-guessing, burned the entire output budget |
-| `openai:gpt-5.4` (default, reasoning off) | wrong answer, 4 output tokens | answered instantly without reasoning at all |
-
-Same weights as the winners above, one knob apart. Because rows were shortlisted after this probe, read the leaderboard as a cost comparison among validated-viable configs rather than a neutral census; the manifest records the selection rationale, and the excluded configs remain replayable from the same `tasks.jsonl`.
+- **The two newest frontier models are tied at the top, a generation ahead of the rest.** Kimi K3 (Moonshot, 98%, ~\$9.4K per million workflows) and GPT-5.6 Sol (OpenAI, the only 100%, ~\$10.4K) finish within ~10% of each other and far ahead of everything else. Read that as a photo finish, not an ordering: at a single 50-task run the gap is inside the margin of error, and one flipped task would swap them. The story is generational, not national: both crush their own vendors' prior models (GPT-5.5 fell to mid-pack; the last-gen Kimi K2.5/K2.6 remain gated for overthinking), and the previous "board" had a Claude model on top. Fresh releases move fast; this is why the board is a living measurement, not a verdict.
+- **The efficiency turnaround is real.** Last generation's default-thinking Kimis were gated at 1.5 to 1.8% efficiency (rumination). K3 reasons at 23% and GPT-5.6 Sol at 37%, the highest of any correct model, on a few hundred tokens per answer. Whatever changed in these training recipes, it priced thinking far better; the benchmark measures exactly that.
+- **Everyone is still far from the human floor, and the cheapest tokens still rank worst.** Even the co-leaders run at 3 to 4x the ideal token cost, and none is perfectly reliable across depth. Meanwhile the lowest-per-token tiers failed regardless of vendor: OpenAI's `gpt-4.1-nano` (cheapest on the sheet) and its new `gpt-5.6-luna`, plus DeepSeek and last-gen Kimi, all landed unusable or gated. Cheap tokens did not buy cheap outcomes. And the benchmark is not partial to any lab: a Claude model (Fable 5) refused a quarter of its tasks on the shallow board, and the current #1 and #2 are not Claude at all.
 
 *Dear frontier labs: we believe you about the olympiad golds. Now please first solve the simple analytical questions any human can easily get right, as efficiently as a human does.*
+
+Earlier runs, the raw-`$/correct` board that motivates the risk adjustment, and the full finding history are in [`HISTORICAL.md`](HISTORICAL.md).
 
 ## Why this exists (for the technically curious)
 
