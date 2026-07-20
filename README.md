@@ -4,7 +4,43 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
-**What does a correct answer actually cost an enterprise on each LLM?**
+## Leaderboard
+
+### Risk-adjusted `$/correct`: how much a business pays to run a million office workflows a month
+
+| # | model (exact config) | acc | eff | `$/correct` | risk-adj `$/correct` | **cost / 1M workflows / mo** | note |
+|--:|----------------------|----:|-----:|------------:|---------------------:|-----------------------------:|------|
+| 🏆 | **Human** (ideal reference) | **100%** | **100%** | **N/A** | **N/A** | **N/A** | the accuracy and efficiency ceiling |
+| 1 | `moonshot:kimi-k3` | 98% | 23.39% | \$0.00908 | **\$0.00941** | **\$9.4K** | co-leader · cheapest per trusted answer |
+| 1 | `openai:gpt-5.6-sol#effort=medium` | **100%** | 36.57% | \$0.01042 | **\$0.01042** | **\$10.4K** | co-leader · only 100% on the board |
+| 3 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | \$0.02862 | \$28.6K | |
+| 4 | `moonshot:kimi-k3#thinking=off` | 88% | 20.97% | \$0.01113 | \$0.04026 | \$40.3K | |
+| 5 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | \$0.235 | \$234.9K | |
+| 6 | `openai:gpt-5.6-terra#effort=medium` | 78% | 38.23% | \$0.00641 | \$0.482 | \$482.3K | most efficient, lower accuracy |
+| 7 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | \$0.933 | \$933.5K | last gen, same price as Sol |
+| 8 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | \$1.29M | |
+| 9 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | \$2.70M | |
+| 10 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | \$2.86M | |
+| 11 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | \$30.6M | |
+| 12 | `openai:gpt-5.6-luna` | 48% | 24.42% | \$0.00670 | \$2.0e+08 | unusable | cheap tier, too many wrong |
+| 13 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | unusable | pruned at depth 9 |
+| 14 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | unusable | pruned at depth 6 |
+| - | `deepseek:deepseek-v4-pro` | 76% | 4.97% | \$0.00391 | (\$0.668) | (\$668.3K) | gated: below 5% efficiency |
+| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | (\$6.9M) | gated: last-gen overthinking |
+| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | (\$58.6M) | gated: last-gen overthinking |
+| - | `openai:gpt-5.4` (default, reasoning off) | 0% | - | n/a | n/a | n/a | no correct answers; pruned at depth 3 |
+
+`kimi-k3` and `gpt-5.6-sol` tie for #1, within a single run's margin of error (K3 the lowest bill, Sol the only 100%), a generation ahead of the rest. `cost / 1M / mo` = risk-adj `$/correct` x 1,000,000. Same token price, one generation apart: Sol runs a million workflows for **\$10.4K** at 100%, GPT-5.5 for **\$933.5K** at 80%. Method, gates, and per-row detail: [`ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
+
+![Accuracy and cost per correct answer versus depth 3 to 30 on the paired ladder, with the ideal V* floor marked](benchmark_data/runs/20260706T222112Z_412022-paired/depth_scaling_paired.png)
+
+No accuracy cliff through depth 30 for the frontier tier; waste stays 20 to 60x above the ideal floor at every depth. Curves and autopsies: [paired `ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
+
+> **Single run, five problems per depth: directional, not definitive.** The co-leaders are within margin of error (tied, not ordered), and LLM outputs vary run to run (the same Fable 5 refused 25% of tasks in one run, none in another). Reproduce with your own sample size before you procure.
+
+New models welcome (Gemini, Grok, Qwen, DeepSeek, and the rest) through the same client, provided each ships its full run directory as evidence. See [Extending](#extending).
+
+## What does a correct answer actually cost an enterprise on each LLM?
 
 Providers bill you per token. What you actually buy is *correct outcomes*, and a wrong one is not free: it flows downstream into a report or an invoice, and someone has to catch and fix it. This benchmark prices the thing that matters, the cost of a **trusted** answer.
 
@@ -23,42 +59,6 @@ That gap is what this benchmark measures: not the price per token, but the dolla
 - **`openai:gpt-5.6-sol#effort=medium`** (co-#1): the only 100% on the board, US-hosted, ~\$10.4K.
 
 They finish within ~\$1K a month per million workflows, closer than a single run can resolve, so reliability, hosting, and data-residency decide it, not price: Sol for zero-defect runs, K3 for the lowest bill. `anthropic:claude-opus-4-8` is a solid third at 92%. Treat this as a shortlist, then run your own workload; the harness makes that cheap. Full board and method: [Leaderboard](#leaderboard).
-
-## Leaderboard
-
-### Business ranking, risk-adjusted `$/correct` (paired depth ladder run 2026-07-06, models through 2026-07-09)
-
-| # | model (exact config) | acc | eff | `$/correct` | risk-adj `$/correct` | **cost / 1M workflows / mo** | note |
-|--:|----------------------|----:|-----:|------------:|---------------------:|-----------------------------:|------|
-| 🏆 | **Human** (Ideal: the bare correct answer) | **100%** | **100%** | **~\$0.0** | **~\$0.0** | **~\$0** | the V\* floor |
-| 1 | `moonshot:kimi-k3` | 98% | 23.39% | \$0.00908 | **\$0.00941** | **\$9.4K** | co-leader · cheapest per trusted answer |
-| 1 | `openai:gpt-5.6-sol#effort=medium` | **100%** | 36.57% | \$0.01042 | **\$0.01042** | **\$10.4K** | co-leader · only 100% on the board |
-| 3 | `anthropic:claude-opus-4-8` | 92% | 21.87% | \$0.01617 | \$0.02862 | \$28.6K | |
-| 4 | `moonshot:kimi-k3#thinking=off` | 88% | 20.97% | \$0.01113 | \$0.04026 | \$40.3K | |
-| 5 | `anthropic:claude-fable-5` | 86% | 17.43% | \$0.04085 | \$0.235 | \$234.9K | |
-| 6 | `openai:gpt-5.6-terra#effort=medium` | 78% | 38.23% | \$0.00641 | \$0.482 | \$482.3K | most efficient, but lower accuracy |
-| 7 | `openai:gpt-5.5` | 80% | 22.14% | \$0.02628 | \$0.933 | \$933.5K | last gen, same price as Sol |
-| 8 | `anthropic:claude-sonnet-5` | 78% | 10.60% | \$0.01710 | \$1.286 | \$1.29M | |
-| 9 | `openai:gpt-5.4#effort=medium` | 76% | 18.29% | \$0.01580 | \$2.701 | \$2.70M | |
-| 10 | `anthropic:claude-haiku-4-5` | 74% | 13.09% | \$0.00686 | \$2.862 | \$2.86M | |
-| 11 | `openai:gpt-5.4#effort=low` | 70% | 28.33% | \$0.00993 | \$30.59 | \$30.6M | |
-| 12 | `openai:gpt-5.6-luna` | 48% | 24.42% | \$0.00670 | \$2.0e+08 | unusable | cheap tier, too many wrong |
-| 13 | `openai:gpt-5.4-nano` | 33% | 14.60% | \$0.00232 | \$3.9e+14 | unusable | pruned at depth 9 |
-| 14 | `openai:gpt-4.1-nano` | 20% | 7.31% | \$0.00409 | \$2.6e+22 | unusable | pruned at depth 6 |
-| - | `deepseek:deepseek-v4-pro` | 76% | 4.97% | \$0.00391 | (\$0.668) | (\$668.3K) | gated: 4.97% efficiency, just under the 5% floor |
-| - | `moonshot:kimi-k2.5` (default thinking) | 76% | 1.46% | \$0.04021 | (\$6.87) | (\$6.9M) | gated: last-gen overthinking |
-| - | `moonshot:kimi-k2.6` (default thinking) | 72% | 1.83% | \$0.05359 | (\$58.6) | (\$58.6M) | gated: last-gen overthinking |
-| - | `openai:gpt-5.4` (default, reasoning off) | 0% | - | n/a | n/a | n/a | no correct answers; pruned at depth 3 |
-
-The two newest frontier models, `kimi-k3` and `gpt-5.6-sol`, are co-ranked #1: their risk-adjusted costs sit within ~10% of each other, closer than the margin of error of a single 50-task run, so we call it a tie rather than split hairs (K3 the lowest bill, Sol the only 100%). Both are a generational leap ahead of everything else, including their own vendors' prior models. **cost / 1M workflows / mo** = risk-adj `$/correct` × 1,000,000: the monthly bill to run a million of these workflows, cleanup of wrong answers priced in. The cleanest illustration is within one vendor: OpenAI's GPT-5.6 Sol and GPT-5.5 are priced identically per token, yet Sol runs a million workflows for **\$10.4K** at 100% and GPT-5.5 for **\$933.5K** at 80%, a ~90x gap, one generation apart. Read the board as a make-or-buy line too: these are workflows a back-office team could process and validate with ordinary computer tools, no LLM in the loop (the Human row), so if staffing that team costs *less* than the cheapest reliable model here (~\$9.4K a month), keep the human-plus-computer workflow or go hybrid. Method, formula, gates, and full per-row counts: [`ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
-
-![Accuracy and cost per correct answer versus depth 3 to 30 on the paired ladder, with the ideal V* floor marked](benchmark_data/runs/20260706T222112Z_412022-paired/depth_scaling_paired.png)
-
-How depth separates them, now with real curves (paired ladder, 2026-07-06): through depth 30 the frontier tier shows no accuracy cliff, and the flat 80% lines are one bait-broken group, not depth. The weak tier collapses and is pruned on schedule. On the cost side nobody approaches the ideal floor at any depth: waste is a flat-rate tax, sitting 20 to 60x above V* from depth 3 all the way to depth 30. Full curves, the 77-parcel exhibit, and the honest outcome of our pre-registered depth prediction: [paired `ANALYSIS.md`](benchmark_data/runs/20260706T222112Z_412022-paired/ANALYSIS.md).
-
-> **Reproducibility disclaimer.** These are single-run numbers, five shared problems per depth: directional, not definitive. The two co-leaders finish within ~10% on cost, well inside the margin of error of a 50-task run, so read them as tied, not ordered. LLM outputs also vary run to run: the same Fable 5 refused 5 of 20 tasks (25%) on the earlier 2026-07-03 board yet refused none here, which alone can swing a ranking. Kimi K3 and GPT-5.6 were both released in July 2026 and evaluated on the existing task set, so they had no more exposure to it than any other model, but they are the freshest and least-sampled rows. Numbers this close need repeated sampling before they are repeatable. Treat this board as a shortlist and a method, not a verdict, and reproduce with your own sample size before you procure.
-
-Rows for Gemini, Grok, Qwen, DeepSeek, and the rest of the field are welcome through the same client (see [Extending](#extending)), provided each ships its full run directory as evidence; scaling the sample count is a community-sized job the harness makes cheap.
 
 ## The three metrics
 
